@@ -659,3 +659,4 @@ com.netflix.discovery.shared.transport.TransportException: Cannot execute reques
 2026-07-04 22:53:41 - Getting all instance registry info from the eureka server
 2026-07-04 22:53:41 - The response status is 200
 2026-07-04 22:58:11 - Resolving eureka endpoints via configuration
+2026-07-04 23:03:11 - Resolving eureka endpoints via configuration
