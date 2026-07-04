@@ -99,3 +99,4 @@ The workspace includes automated startup scripts for both **macOS** (`start.sh`)
    *This starts the Eureka Server, pauses for 12 seconds, then launches the remaining services and the Vite frontend in separate Command Prompt windows.*
 
 ---
+
