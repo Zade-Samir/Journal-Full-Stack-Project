@@ -267,8 +267,39 @@ public class JournalServiceImpl implements JournalService {
                 );
     }
 
+    @Override
+    public int getJournalStreak(String userEmail) {
+        LOGGER.info("Calculating journal streak for user: {}", userEmail);
+        List<LocalDate> dates = repo.findDatesByUserIdAndIsDeletedFalse(userEmail);
 
+        if (dates == null || dates.isEmpty()) {
+            return 0;
+        }
 
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
+        LocalDate latestDate = dates.get(0);
+
+        // If the latest entry is older than yesterday, the streak is broken (0)
+        if (!latestDate.equals(today) && !latestDate.equals(yesterday)) {
+            return 0;
+        }
+
+        int streak = 1;
+        LocalDate current = latestDate;
+        for (int i = 1; i < dates.size(); i++) {
+            LocalDate next = dates.get(i);
+            if (next.equals(current.minusDays(1))) {
+                streak++;
+                current = next;
+            } else if (next.equals(current)) {
+                // Ignore duplicates on the same day if they exist
+            } else {
+                break;
+            }
+        }
+        return streak;
+    }
 }
 
 

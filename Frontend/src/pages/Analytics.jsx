@@ -29,6 +29,7 @@ export function Analytics() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState({ moodCounts: [], dailyMoods: [] });
+  const [streak, setStreak] = useState(0);
   const { isFullWidth } = useAppSettings();
 
   const fetchStats = useCallback(async () => {
@@ -38,16 +39,28 @@ export function Analytics() {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Authentication required. Please log in.');
 
-      const response = await fetch(`${API_BASE_URL}/journal/stats?range=${range}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const [statsRes, streakRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/journal/stats?range=${range}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        fetch(`${API_BASE_URL}/journal/streak`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ]);
 
-      const json = await response.json();
-      if (!response.ok || json.success === false) {
-        throw new Error(json.message || 'Failed to fetch analytics data');
+      const statsJson = await statsRes.json();
+      if (!statsRes.ok || statsJson.success === false) {
+        throw new Error(statsJson.message || 'Failed to fetch analytics data');
       }
 
-      setStats(json.data || { moodCounts: [], dailyMoods: [] });
+      setStats(statsJson.data || { moodCounts: [], dailyMoods: [] });
+
+      if (streakRes.ok) {
+        const streakJson = await streakRes.json();
+        if (streakJson.success) {
+          setStreak(streakJson.data.streak);
+        }
+      }
     } catch (err) {
       setError(err.message || 'Error loading analytics.');
     } finally {
@@ -96,44 +109,7 @@ export function Analytics() {
     averageMoodScore = (totalScore / totalLogs).toFixed(1);
   }
 
-  // Calculate current streak
-  const calculateStreak = () => {
-    if (stats.dailyMoods.length === 0) return 0;
-    
-    // Sort daily moods descending by date
-    const sortedEntries = [...stats.dailyMoods].sort((a, b) => new Date(b.date) - new Date(a.date));
-    
-    const todayStr = new Date().toISOString().slice(0, 10);
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toISOString().slice(0, 10);
-
-    const latestDateStr = sortedEntries[0].date;
-    
-    // If the latest entry is older than yesterday, the streak is broken (0)
-    if (latestDateStr !== todayStr && latestDateStr !== yesterdayStr) {
-      return 0;
-    }
-
-    let streak = 0;
-    let expectedDate = new Date(latestDateStr);
-
-    for (let i = 0; i < sortedEntries.length; i++) {
-      const entryDateStr = sortedEntries[i].date;
-      const expectedDateStr = expectedDate.toISOString().slice(0, 10);
-      
-      if (entryDateStr === expectedDateStr) {
-        streak++;
-        expectedDate.setDate(expectedDate.getDate() - 1); // move back 1 day
-      } else if (new Date(entryDateStr) < expectedDate) {
-        // Gap found, streak ends
-        break;
-      }
-    }
-    return streak;
-  };
-
-  const currentStreak = calculateStreak();
+  const currentStreak = streak;
 
   // Generate heatmap matrix (365 days)
   const getHeatmapData = () => {

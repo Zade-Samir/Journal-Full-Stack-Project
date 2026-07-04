@@ -1,11 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Flower2, ArrowLeft } from 'lucide-react';
 import { Button } from '../components/Button';
+import { API_BASE_URL } from '../config/api';
 
 export function Completion() {
   const navigate = useNavigate();
   const dateStr = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(new Date());
+
+  const [streak, setStreak] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchStreak() {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const response = await fetch(`${API_BASE_URL}/journal/streak`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const json = await response.json();
+        if (response.ok && json.success) {
+          setStreak(json.data.streak);
+        }
+      } catch (err) {
+        console.error('Error fetching streak:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchStreak();
+  }, []);
 
   return (
     <div className="min-h-screen bg-bg-base flex flex-col items-center justify-center p-6 text-center">
@@ -44,12 +74,18 @@ export function Completion() {
       <div className="w-full max-w-sm">
         <div className="flex justify-between items-end mb-3">
           <span className="text-[10px] text-text-tertiary uppercase tracking-[0.1em]">Reflection Streak</span>
-          <span className="text-[10px] font-bold text-brand uppercase tracking-[0.1em]">12 Days</span>
+          <span className="text-[10px] font-bold text-brand uppercase tracking-[0.1em]">
+            {loading ? 'Loading...' : `${streak} ${streak === 1 ? 'Day' : 'Days'}`}
+          </span>
         </div>
         <div className="h-1 w-full bg-border rounded-full overflow-hidden">
-          <div className="h-full bg-brand rounded-full w-[12%]" />
+          <div 
+            className="h-full bg-brand rounded-full transition-all duration-500 ease-out" 
+            style={{ width: `${Math.min((streak / 30) * 100, 100)}%` }}
+          />
         </div>
       </div>
     </div>
   );
 }
+

@@ -21,4 +21,6 @@ public interface JournalService {
     void deleteJournal(Long journalId, String userEmail, String role);
 
     JournalRequestDTO autoSaveJournal(String userEmail, JournalAutoSaveDTO dto);
+
+    int getJournalStreak(String userEmail);
 }

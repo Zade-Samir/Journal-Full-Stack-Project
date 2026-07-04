@@ -38,4 +38,9 @@ public interface JournalRepo extends JpaRepository<Journal, Long> {
             @Param("userId") String userId,
             @Param("startDate") LocalDate startDate
     );
+
+    @Query("SELECT DISTINCT j.date FROM Journal j " +
+           "WHERE j.userId = :userId AND j.isDeleted = false " +
+           "ORDER BY j.date DESC")
+    List<LocalDate> findDatesByUserIdAndIsDeletedFalse(@Param("userId") String userId);
 }

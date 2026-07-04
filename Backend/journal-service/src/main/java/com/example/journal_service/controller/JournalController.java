@@ -3,6 +3,7 @@ package com.example.journal_service.controller;
 import com.example.journal_service.Dto.JournalAutoSaveDTO;
 import com.example.journal_service.Dto.JournalRequestDTO;
 import com.example.journal_service.Dto.JournalStatsDTO;
+import com.example.journal_service.Dto.StreakDTO;
 import com.example.journal_service.common.ApiResponse;
 import com.example.journal_service.service.JournalService;
 import jakarta.validation.Valid;
@@ -94,6 +95,26 @@ public class JournalController {
                         true,
                         "Journal stats fetched successfully",
                         result
+                )
+        );
+    }
+
+    //Get journal streak
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @GetMapping("/streak")
+    public ResponseEntity<ApiResponse<StreakDTO>> getJournalStreak(
+            Authentication authentication
+    ) {
+        String userEmail = getUserEmail(authentication);
+
+        LOGGER.info("API HIT: Getting journal streak for user: {}", userEmail);
+        int streak = service.getJournalStreak(userEmail);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Journal streak fetched successfully",
+                        new StreakDTO(streak)
                 )
         );
     }
