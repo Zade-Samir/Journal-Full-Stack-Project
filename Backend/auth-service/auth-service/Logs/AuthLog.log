@@ -1,9 +1,0 @@
-2026-07-05 00:01:54 - Resolving eureka endpoints via configuration
-2026-07-05 00:04:33 - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-07-05 00:04:33 - Initializing Servlet 'dispatcherServlet'
-2026-07-05 00:04:33 - Completed initialization in 3 ms
-2026-07-05 00:04:34 - API HIT: Login endpoint called
-2026-07-05 00:04:34 - Login attempt for email: samirzade@gmail.com
-2026-07-05 00:04:34 - Login successful for email: samirzade@gmail.com
-2026-07-05 00:06:17 - JournalAuthDB - Thread starvation or clock leap detected (housekeeper delta=1m23s347ms).
-2026-07-05 00:07:48 - Resolving eureka endpoints via configuration
