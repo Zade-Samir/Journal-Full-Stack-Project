@@ -3,3 +3,8 @@ Backend/.idea/
 Backend/.metadata/
 Backend/logs/
 
+.vscode
+
+# Ignore macOS system files
+**/.DS_Store
+.DS_Store
