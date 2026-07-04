@@ -99,19 +99,3 @@ The workspace includes automated startup scripts for both **macOS** (`start.sh`)
    *This starts the Eureka Server, pauses for 12 seconds, then launches the remaining services and the Vite frontend in separate Command Prompt windows.*
 
 ---
-
-## 📷 Screenshots & User Interface
-
-Here are visual previews of the application interface, showing the home logging dashboard, goal trackers, and stats.
-
-### 1. The Quiet Room (Home Journal Logger)
-*A pristine writing vellum with active goal selector checkboxes, daily insights, gratitude logs, and emotional selectors.*
-![Home Screen](Documentations/assets/Home.png)
-
-### 2. Login Page
-*Secure Google OAuth2 and email authentication gateway.*
-![Login Screen](Documentations/assets/login.jpg)
-
-### 3. Archive Log History
-*Browse and filter historic daily journal logs.*
-![Archive Screen](Documentations/assets/Saved%20Page.png)
