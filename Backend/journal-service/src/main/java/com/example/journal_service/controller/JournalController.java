@@ -207,5 +207,25 @@ public class JournalController {
         );
     }
 
+    //Get weekly/monthly reflection summary
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @GetMapping("/reflection")
+    public ResponseEntity<ApiResponse<com.example.journal_service.Dto.ReflectionSummaryDTO>> getReflectionSummary(
+            Authentication authentication,
+            @RequestParam(defaultValue = "7d") String range,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate
+    ) {
+        String userEmail = getUserEmail(authentication);
+        LOGGER.info("API HIT: Getting reflection summary for user: {} with range: {} (or custom dates: {} to {})", userEmail, range, startDate, endDate);
+        com.example.journal_service.Dto.ReflectionSummaryDTO result = service.getReflectionSummary(userEmail, range, startDate, endDate);
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Reflection summary fetched successfully",
+                        result
+                )
+        );
+    }
 
 }

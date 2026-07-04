@@ -1,15 +1,14 @@
 package com.example.journal_service.service.Impl;
 
-import com.example.journal_service.Dto.JournalAutoSaveDTO;
-import com.example.journal_service.Dto.JournalRequestDTO;
-import com.example.journal_service.Dto.JournalStatsDTO;
-import com.example.journal_service.Dto.MoodCountDTO;
-import com.example.journal_service.Dto.DailyMoodDTO;
+import com.example.journal_service.Dto.*;
+import com.example.journal_service.entity.Goal;
+import com.example.journal_service.entity.GoalStatus;
+import com.example.journal_service.entity.Journal;
 import com.example.journal_service.exception.ResourceNotFoundException;
 import com.example.journal_service.exception.UnauthorizedException;
-import com.example.journal_service.repo.JournalRepo;
-import com.example.journal_service.entity.Journal;
 import com.example.journal_service.mapper.JournalMapper;
+import com.example.journal_service.repo.GoalRepo;
+import com.example.journal_service.repo.JournalRepo;
 import com.example.journal_service.service.JournalService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -22,12 +21,14 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class JournalServiceImpl implements JournalService {
 
     private final JournalRepo repo;
+    private final GoalRepo goalRepo;
     private final JournalMapper mapper;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalServiceImpl.class);
@@ -68,6 +69,14 @@ public class JournalServiceImpl implements JournalService {
         journal.setDate(LocalDate.now());
         journal.setCreatedAt(LocalDateTime.now());
         journal.setUpdatedAt(LocalDateTime.now());
+
+        if (dto.getGoalIds() != null && !dto.getGoalIds().isEmpty()) {
+            List<Goal> goals = goalRepo.findAllById(dto.getGoalIds());
+            List<Goal> userGoals = goals.stream()
+                    .filter(g -> g.getUserId().equals(userEmail))
+                    .collect(Collectors.toList());
+            journal.setGoals(userGoals);
+        }
 
         Journal saved = repo.save(journal);
 
@@ -126,6 +135,16 @@ public class JournalServiceImpl implements JournalService {
         existingJournal.setGratitude(dto.getGratitude());
         existingJournal.setShortTermGoal(dto.getShortTermGoal());
         existingJournal.setLongTermGoal(dto.getLongTermGoal());
+
+        if (dto.getGoalIds() != null) {
+            List<Goal> goals = goalRepo.findAllById(dto.getGoalIds());
+            List<Goal> userGoals = goals.stream()
+                    .filter(g -> g.getUserId().equals(userEmail))
+                    .collect(Collectors.toList());
+            existingJournal.setGoals(userGoals);
+        } else {
+            existingJournal.getGoals().clear();
+        }
 
         existingJournal.setWhatIDoForGoal(dto.getWhatIDoForGoal());
         existingJournal.setFeeling(dto.getFeeling());
@@ -211,6 +230,13 @@ public class JournalServiceImpl implements JournalService {
         }
         if(dto.getLongTermGoal() != null) {
             journal.setLongTermGoal(dto.getLongTermGoal());
+        }
+        if(dto.getGoalIds() != null) {
+            List<Goal> goals = goalRepo.findAllById(dto.getGoalIds());
+            List<Goal> userGoals = goals.stream()
+                    .filter(g -> g.getUserId().equals(userEmail))
+                    .collect(Collectors.toList());
+            journal.setGoals(userGoals);
         }
         if(dto.getWhatIDoForGoal() != null) {
             journal.setWhatIDoForGoal(dto.getWhatIDoForGoal());
@@ -299,6 +325,82 @@ public class JournalServiceImpl implements JournalService {
             }
         }
         return streak;
+    }
+
+    @Override
+    public ReflectionSummaryDTO getReflectionSummary(String userEmail, String range, String startDateStr, String endDateStr) {
+        LOGGER.info("Fetching reflection summary for user: {} with range: {}, startDate: {}, endDate: {}", userEmail, range, startDateStr, endDateStr);
+
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+
+        if (startDateStr != null && !startDateStr.trim().isEmpty() && endDateStr != null && !endDateStr.trim().isEmpty()) {
+            try {
+                startDate = LocalDate.parse(startDateStr);
+                endDate = LocalDate.parse(endDateStr);
+            } catch (Exception e) {
+                LOGGER.warn("Failed to parse start/end dates: {} - {}, falling back to range", startDateStr, endDateStr);
+            }
+        }
+
+        if (startDate == null || endDate == null) {
+            endDate = LocalDate.now();
+            if ("30d".equalsIgnoreCase(range) || "month".equalsIgnoreCase(range)) {
+                startDate = endDate.minusDays(30);
+            } else {
+                // Default is 7d (week)
+                startDate = endDate.minusDays(7);
+            }
+        }
+
+        List<Journal> journals = repo.findByUserIdAndDateBetweenAndIsDeletedFalseOrderByDateDesc(userEmail, startDate, endDate);
+
+        int totalEntries = journals.size();
+        java.util.Map<String, Long> moodFrequency = journals.stream()
+                .filter(j -> j.getFeeling() != null)
+                .collect(Collectors.groupingBy(j -> j.getFeeling().toLowerCase(), Collectors.counting()));
+
+        String dominantMood = "N/A";
+        long maxCount = 0;
+        for (java.util.Map.Entry<String, Long> entry : moodFrequency.entrySet()) {
+            if (entry.getValue() > maxCount) {
+                maxCount = entry.getValue();
+                dominantMood = entry.getKey();
+            }
+        }
+
+        List<String> gratitudeList = journals.stream()
+                .filter(j -> j.getGratitude() != null)
+                .flatMap(j -> j.getGratitude().stream())
+                .filter(g -> g != null && !g.trim().isEmpty())
+                .collect(Collectors.toList());
+
+        // Completed goals in range (updated in range and marked DONE)
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay();
+        List<Goal> completedGoals = goalRepo.findByUserIdAndStatusAndUpdatedAtBetween(userEmail, GoalStatus.DONE, startDateTime, endDateTime);
+
+        // Active goals (IN_PROGRESS or NOT_STARTED)
+        List<Goal> inProgressGoals = goalRepo.findByUserIdAndStatus(userEmail, GoalStatus.IN_PROGRESS);
+        List<Goal> notStartedGoals = goalRepo.findByUserIdAndStatus(userEmail, GoalStatus.NOT_STARTED);
+
+        java.util.List<Goal> activeGoals = new java.util.ArrayList<>();
+        activeGoals.addAll(inProgressGoals);
+        activeGoals.addAll(notStartedGoals);
+
+        List<GoalDTO> completedGoalDTOs = completedGoals.stream().map(mapper::toGoalDTO).collect(Collectors.toList());
+        List<GoalDTO> activeGoalDTOs = activeGoals.stream().map(mapper::toGoalDTO).collect(Collectors.toList());
+
+        return new ReflectionSummaryDTO(
+                startDate,
+                endDate,
+                totalEntries,
+                dominantMood,
+                moodFrequency,
+                gratitudeList,
+                completedGoalDTOs,
+                activeGoalDTOs
+        );
     }
 }
 

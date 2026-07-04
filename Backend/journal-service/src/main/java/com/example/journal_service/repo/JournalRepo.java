@@ -43,4 +43,9 @@ public interface JournalRepo extends JpaRepository<Journal, Long> {
            "WHERE j.userId = :userId AND j.isDeleted = false " +
            "ORDER BY j.date DESC")
     List<LocalDate> findDatesByUserIdAndIsDeletedFalse(@Param("userId") String userId);
+
+    @Query("SELECT j FROM Journal j JOIN j.goals g WHERE g.id = :goalId AND j.userId = :userId AND j.isDeleted = false ORDER BY j.date DESC")
+    List<Journal> findJournalsByGoalIdAndUserId(@Param("goalId") Long goalId, @Param("userId") String userId);
+
+    List<Journal> findByUserIdAndDateBetweenAndIsDeletedFalseOrderByDateDesc(String userId, LocalDate startDate, LocalDate endDate);
 }

@@ -15,6 +15,7 @@ public class JournalAutoSaveDTO {
     private List<String> gratitude;
     private List<String> shortTermGoal;
     private List<String> longTermGoal;
+    private List<Long> goalIds;
 
     private String whatIDoForGoal;
     private String feeling;

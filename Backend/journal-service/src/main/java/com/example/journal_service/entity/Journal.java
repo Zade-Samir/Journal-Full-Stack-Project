@@ -40,6 +40,18 @@ public class Journal {
     @ElementCollection
     private List<String> longTermGoal;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "journal_goal",
+            joinColumns = @JoinColumn(name = "journal_id"),
+            inverseJoinColumns = @JoinColumn(name = "goal_id"),
+            indexes = {
+                    @Index(name = "idx_jg_journal", columnList = "journal_id"),
+                    @Index(name = "idx_jg_goal", columnList = "goal_id")
+            }
+    )
+    private List<Goal> goals = new java.util.ArrayList<>();
+
     private String whatIDoForGoal;
     private String feeling;
     private String feelingNote;

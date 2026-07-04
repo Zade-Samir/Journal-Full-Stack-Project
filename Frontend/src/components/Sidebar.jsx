@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { cn } from '../utils/cn';
-import { PenSquare, LibraryBig, BarChart2, Settings, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { PenSquare, LibraryBig, BarChart2, Target, Sparkles, Settings, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Button } from './Button';
 
 export function Sidebar({
@@ -16,6 +16,8 @@ export function Sidebar({
   const navItems = [
     { label: "Today", path: "/create", icon: PenSquare, end: true },
     { label: "Archive", path: "/archive", icon: LibraryBig },
+    { label: "Goals", path: "/goals", icon: Target },
+    { label: "Reflection", path: "/reflection", icon: Sparkles },
     { label: "Analytics", path: "/analytics", icon: BarChart2 },
   ];
 

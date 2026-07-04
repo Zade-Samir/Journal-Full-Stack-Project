@@ -26,6 +26,8 @@ public class JournalRequestDTO {
     private List<String> gratitude;
     private List<String> shortTermGoal;
     private List<String> longTermGoal;
+    private List<Long> goalIds;
+    private List<GoalDTO> goals;
 
     @NotBlank(message = "Your work for goal cannot be empty")
     private String whatIDoForGoal;

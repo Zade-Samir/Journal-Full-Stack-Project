@@ -21,6 +21,8 @@ export function Home() {
   const [gratitude, setGratitude] = useState(['', '', '']);
   const [shortTermGoal, setShortTermGoal] = useState(['', '']);
   const [longTermGoal, setLongTermGoal] = useState(['', '']);
+  const [activeGoalsList, setActiveGoalsList] = useState([]);
+  const [selectedGoalIds, setSelectedGoalIds] = useState([]);
   
   const [whatIDoForGoal, setWhatIDoForGoal] = useState('');
   const [mood, setMood] = useState('neutral');
@@ -41,6 +43,12 @@ export function Home() {
   };
 
   const addToArray = (setter, array) => setter([...array, '']);
+
+  const handleToggleGoal = (id) => {
+    setSelectedGoalIds(prev => 
+      prev.includes(id) ? prev.filter(gid => gid !== id) : [...prev, id]
+    );
+  };
 
   const today = new Intl.DateTimeFormat('en-US', { 
     weekday: 'long', 
@@ -74,6 +82,7 @@ export function Home() {
           if (entry.gratitude && entry.gratitude.length > 0) setGratitude(entry.gratitude);
           if (entry.shortTermGoal && entry.shortTermGoal.length > 0) setShortTermGoal(entry.shortTermGoal);
           if (entry.longTermGoal && entry.longTermGoal.length > 0) setLongTermGoal(entry.longTermGoal);
+          if (entry.goalIds && entry.goalIds.length > 0) setSelectedGoalIds(entry.goalIds);
           
           if (entry.whatIDoForGoal) setWhatIDoForGoal(entry.whatIDoForGoal);
           if (entry.feeling) setMood(entry.feeling);
@@ -85,8 +94,25 @@ export function Home() {
         setTimeout(() => setIsDataLoaded(true), 500); // 500ms grace period for state updates
       }
     };
+
+    const fetchActiveGoals = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/journal/goals`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        const json = await res.json();
+        if (res.ok && json.success) {
+          setActiveGoalsList(json.data || []);
+        }
+      } catch (err) {
+        console.error("Could not fetch goals", err);
+      }
+    };
     
     fetchToday();
+    fetchActiveGoals();
   }, []);
 
   // Debounced Auto-Save
@@ -105,6 +131,7 @@ export function Home() {
       gratitude: gratitude.filter(g => g.trim() !== ''),
       shortTermGoal: shortTermGoal.filter(g => g.trim() !== ''),
       longTermGoal: longTermGoal.filter(g => g.trim() !== ''),
+      goalIds: selectedGoalIds,
       whatIDoForGoal, 
       feeling: mood, 
       feelingNote
@@ -149,7 +176,7 @@ export function Home() {
 
     return () => clearTimeout(timeoutId);
 
-  }, [whatDidIDo, bestMoment, worstMoment, whatILearned, gratitude, shortTermGoal, longTermGoal, whatIDoForGoal, mood, feelingNote, isDataLoaded]);
+  }, [whatDidIDo, bestMoment, worstMoment, whatILearned, gratitude, shortTermGoal, longTermGoal, whatIDoForGoal, mood, feelingNote, isDataLoaded, selectedGoalIds]);
 
   const handleSave = async () => {
     setError(null);
@@ -181,6 +208,7 @@ export function Home() {
         gratitude: gratitude.filter(g => g.trim() !== ''),
         shortTermGoal: shortTermGoal.filter(g => g.trim() !== ''),
         longTermGoal: longTermGoal.filter(g => g.trim() !== ''),
+        goalIds: selectedGoalIds,
         whatIDoForGoal,
         feeling: mood,
         feelingNote
@@ -346,36 +374,42 @@ export function Home() {
 
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <GoalCard title="Short-term goals">
-            <div className="space-y-3">
-              {shortTermGoal.map((val, i) => (
-                <div key={i} className="flex items-start gap-3 mt-1 group">
-                  <div className={cn("w-1.5 h-1.5 shrink-0 rounded-full mt-2 transition-colors", i === 0 ? "bg-brand" : "bg-brand/30 group-focus-within:bg-brand")} />
-                  <TextArea rows={1} value={val} onChange={(e) => updateArray(setShortTermGoal, shortTermGoal, i, e.target.value)} placeholder={i === 0 ? "Next 1-3 months..." : "Add goal..."} className="bg-transparent border-none text-sm w-full text-text-secondary outline-none focus:text-text-primary transition-colors min-h-[20px]" />
-                </div>
-              ))}
+            <div className="space-y-2">
+              {activeGoalsList.filter(g => g.type === 'SHORT_TERM' && g.status !== 'DONE').length === 0 ? (
+                <p className="text-xs text-text-tertiary italic">No active short-term goals. Set some in the Goals Dashboard.</p>
+              ) : (
+                activeGoalsList.filter(g => g.type === 'SHORT_TERM' && g.status !== 'DONE').map(goal => (
+                  <label key={goal.id} className="flex items-center gap-3 p-2.5 bg-input-bg/40 border border-border/40 hover:border-brand/30 rounded-xl cursor-pointer transition-all">
+                    <input 
+                      type="checkbox"
+                      checked={selectedGoalIds.includes(goal.id)}
+                      onChange={() => handleToggleGoal(goal.id)}
+                      className="rounded border-border text-brand focus:ring-brand"
+                    />
+                    <span className={cn("text-xs font-medium text-text-secondary", selectedGoalIds.includes(goal.id) && "text-brand font-bold")}>{goal.title}</span>
+                  </label>
+                ))
+              )}
             </div>
-            <button 
-              onClick={() => addToArray(setShortTermGoal, shortTermGoal)}
-              className="mt-4 flex items-center gap-2 text-xs text-text-tertiary hover:text-text-primary transition-colors"
-            >
-              <Plus size={14} /> Add goal
-            </button>
           </GoalCard>
           <GoalCard title="Long-term goals">
-            <div className="space-y-3">
-              {longTermGoal.map((val, i) => (
-                <div key={i} className="flex items-start gap-3 mt-1 group">
-                  <div className={cn("w-1.5 h-1.5 shrink-0 rounded-full mt-2 transition-colors", i === 0 ? "bg-brand" : "bg-brand/30 group-focus-within:bg-brand")} />
-                  <TextArea rows={1} value={val} onChange={(e) => updateArray(setLongTermGoal, longTermGoal, i, e.target.value)} placeholder={i === 0 ? "Next 5-10 years..." : "Add vision..."} className="bg-transparent border-none text-sm w-full text-text-secondary outline-none focus:text-text-primary transition-colors min-h-[20px]" />
-                </div>
-              ))}
+            <div className="space-y-2">
+              {activeGoalsList.filter(g => g.type === 'LONG_TERM' && g.status !== 'DONE').length === 0 ? (
+                <p className="text-xs text-text-tertiary italic">No active long-term goals. Set some in the Goals Dashboard.</p>
+              ) : (
+                activeGoalsList.filter(g => g.type === 'LONG_TERM' && g.status !== 'DONE').map(goal => (
+                  <label key={goal.id} className="flex items-center gap-3 p-2.5 bg-input-bg/40 border border-border/40 hover:border-brand/30 rounded-xl cursor-pointer transition-all">
+                    <input 
+                      type="checkbox"
+                      checked={selectedGoalIds.includes(goal.id)}
+                      onChange={() => handleToggleGoal(goal.id)}
+                      className="rounded border-border text-brand focus:ring-brand"
+                    />
+                    <span className={cn("text-xs font-medium text-text-secondary", selectedGoalIds.includes(goal.id) && "text-brand font-bold")}>{goal.title}</span>
+                  </label>
+                ))
+              )}
             </div>
-            <button 
-              onClick={() => addToArray(setLongTermGoal, longTermGoal)}
-              className="mt-4 flex items-center gap-2 text-xs text-text-tertiary hover:text-text-primary transition-colors"
-            >
-              <Plus size={14} /> Add vision
-            </button>
           </GoalCard>
         </section>
 

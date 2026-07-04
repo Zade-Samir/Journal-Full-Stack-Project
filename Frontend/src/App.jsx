@@ -4,6 +4,8 @@ import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { Archive } from './pages/Archive';
 import { Analytics } from './pages/Analytics';
+import { Goals } from './pages/Goals';
+import { Reflection } from './pages/Reflection';
 import { Completion } from './pages/Completion';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
@@ -25,6 +27,8 @@ export default function App() {
               <Route path="/create" element={<Home />} />
               <Route path="/archive" element={<Archive />} />
               <Route path="/analytics" element={<Analytics />} />
+              <Route path="/goals" element={<Goals />} />
+              <Route path="/reflection" element={<Reflection />} />
             </Route>
             <Route path="/complete" element={<Completion />} />
           </Route>

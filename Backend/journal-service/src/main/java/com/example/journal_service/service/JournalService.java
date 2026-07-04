@@ -23,4 +23,6 @@ public interface JournalService {
     JournalRequestDTO autoSaveJournal(String userEmail, JournalAutoSaveDTO dto);
 
     int getJournalStreak(String userEmail);
+
+    com.example.journal_service.Dto.ReflectionSummaryDTO getReflectionSummary(String userEmail, String range, String startDate, String endDate);
 }

@@ -27,6 +27,8 @@ export function JournalModal({ journal, onClose, onDelete, onUpdate, startInEdit
   const [whatIDoForGoal, setWhatIDoForGoal] = useState('');
   const [mood, setMood] = useState('neutral');
   const [feelingNote, setFeelingNote] = useState('');
+  const [activeGoalsList, setActiveGoalsList] = useState([]);
+  const [selectedGoalIds, setSelectedGoalIds] = useState([]);
 
   const journalIdProp = journal?.fullData?.id || journal?.id;
 
@@ -46,10 +48,28 @@ export function JournalModal({ journal, onClose, onDelete, onUpdate, startInEdit
       setGratitude(fullData.gratitude?.length ? fullData.gratitude : ['']);
       setShortTermGoal(fullData.shortTermGoal?.length ? fullData.shortTermGoal : ['']);
       setLongTermGoal(fullData.longTermGoal?.length ? fullData.longTermGoal : ['']);
+      setSelectedGoalIds(fullData.goalIds || []);
       setWhatIDoForGoal(fullData.whatIDoForGoal || '');
       setMood(journal.mood || 'neutral');
       setFeelingNote(fullData.feelingNote || '');
     }
+
+    const fetchActiveGoals = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/journal/goals`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        const json = await res.json();
+        if (res.ok && json.success) {
+          setActiveGoalsList(json.data || []);
+        }
+      } catch (err) {
+        console.error("Could not fetch goals in modal", err);
+      }
+    };
+    fetchActiveGoals();
   }, [journalIdProp]);
 
   // Debounced Editor Auto-Save using PUT
@@ -82,6 +102,7 @@ export function JournalModal({ journal, onClose, onDelete, onUpdate, startInEdit
           gratitude: gratitude.filter(g => g.trim() !== ''),
           shortTermGoal: shortTermGoal.filter(g => g.trim() !== ''),
           longTermGoal: longTermGoal.filter(g => g.trim() !== ''),
+          goalIds: selectedGoalIds,
           whatIDoForGoal, feeling: mood, feelingNote
         };
 
@@ -97,28 +118,34 @@ export function JournalModal({ journal, onClose, onDelete, onUpdate, startInEdit
         if (response.ok) {
            setSaveStatus('saved');
            if (onUpdate) onUpdate({ ...payload, id });
-        } else {
-           setSaveStatus('error');
-        }
-      } catch (err) {
-        setSaveStatus('error');
-      }
-    }, 2000); // 2 second debounce
+         } else {
+            setSaveStatus('error');
+         }
+       } catch (err) {
+         setSaveStatus('error');
+       }
+     }, 2000); // 2 second debounce
+ 
+     return () => clearTimeout(timeoutId);
+ 
+   }, [isEditing, whatDidIDo, bestMoment, worstMoment, whatILearned, gratitude, shortTermGoal, longTermGoal, whatIDoForGoal, mood, feelingNote, selectedGoalIds]);
+ 
+   if (!journal || !journal.fullData) return null;
+ 
+   const id = journal.fullData.id || journal.id;
+ 
+   const updateArray = (setter, array, index, value) => {
+     const newArr = [...array];
+     newArr[index] = value;
+     setter(newArr);
+   };
+   const addToArray = (setter, array) => setter([...array, '']);
 
-    return () => clearTimeout(timeoutId);
-
-  }, [isEditing, whatDidIDo, bestMoment, worstMoment, whatILearned, gratitude, shortTermGoal, longTermGoal, whatIDoForGoal, mood, feelingNote]);
-
-  if (!journal || !journal.fullData) return null;
-
-  const id = journal.fullData.id || journal.id;
-
-  const updateArray = (setter, array, index, value) => {
-    const newArr = [...array];
-    newArr[index] = value;
-    setter(newArr);
-  };
-  const addToArray = (setter, array) => setter([...array, '']);
+   const handleToggleGoal = (gid) => {
+     setSelectedGoalIds(prev => 
+       prev.includes(gid) ? prev.filter(x => x !== gid) : [...prev, gid]
+     );
+   };
 
   const confirmDelete = () => {
     setIsMenuOpen(false);
@@ -365,34 +392,68 @@ export function JournalModal({ journal, onClose, onDelete, onUpdate, startInEdit
 
             <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <GoalCard title="Short-term goals">
-                <div className="space-y-3">
-                  {shortTermGoal.map((val, i) => (
-                    <div key={i} className="flex items-start gap-3 mt-1 group">
-                      <div className={cn("w-1.5 h-1.5 shrink-0 rounded-full mt-2 transition-colors", i === 0 ? "bg-brand" : "bg-brand/30")} />
-                      <TextArea readOnly={!isEditing} rows={1} value={val} onChange={e => updateArray(setShortTermGoal, shortTermGoal, i, e.target.value)} className={cn("bg-transparent border-none text-sm w-full text-text-secondary min-h-[20px] transition-all", !isEditing ? "pointer-events-none" : "focus:text-text-primary outline-none")} />
-                    </div>
-                  ))}
+                <div className="space-y-2">
+                  {isEditing ? (
+                    activeGoalsList.filter(g => g.type === 'SHORT_TERM' && g.status !== 'DONE').length === 0 ? (
+                      <p className="text-xs text-text-tertiary italic">No active short-term goals. Set some in the Goals Dashboard.</p>
+                    ) : (
+                      activeGoalsList.filter(g => g.type === 'SHORT_TERM' && g.status !== 'DONE').map(goal => (
+                        <label key={goal.id} className="flex items-center gap-3 p-2 bg-input-bg/40 border border-border/40 hover:border-brand/35 rounded-xl cursor-pointer transition-all">
+                          <input 
+                            type="checkbox"
+                            checked={selectedGoalIds.includes(goal.id)}
+                            onChange={() => handleToggleGoal(goal.id)}
+                            className="rounded border-border text-brand focus:ring-brand"
+                          />
+                          <span className={cn("text-xs font-medium text-text-secondary", selectedGoalIds.includes(goal.id) && "text-brand font-bold")}>{goal.title}</span>
+                        </label>
+                      ))
+                    )
+                  ) : (
+                    (journal?.fullData?.goals || []).filter(g => g.type === 'SHORT_TERM').length === 0 ? (
+                      <p className="text-xs text-text-tertiary italic">No short-term goals linked.</p>
+                    ) : (
+                      (journal?.fullData?.goals || []).filter(g => g.type === 'SHORT_TERM').map(goal => (
+                        <div key={goal.id} className="flex items-center gap-2.5 p-2 bg-input-bg/30 border border-border/40 rounded-xl">
+                          <div className="w-1.5 h-1.5 rounded-full bg-brand shrink-0" />
+                          <span className="text-xs text-text-secondary font-medium">{goal.title}</span>
+                        </div>
+                      ))
+                    )
+                  )}
                 </div>
-                {isEditing && (
-                  <button onClick={() => addToArray(setShortTermGoal, shortTermGoal)} className="mt-4 flex items-center gap-2 text-xs text-text-tertiary hover:text-text-primary transition-colors">
-                    <Plus size={14} /> Add goal
-                  </button>
-                )}
               </GoalCard>
               <GoalCard title="Long-term goals">
-                <div className="space-y-3">
-                  {longTermGoal.map((val, i) => (
-                    <div key={i} className="flex items-start gap-3 mt-1 group">
-                      <div className={cn("w-1.5 h-1.5 shrink-0 rounded-full mt-2 transition-colors", i === 0 ? "bg-brand" : "bg-brand/30")} />
-                      <TextArea readOnly={!isEditing} rows={1} value={val} onChange={e => updateArray(setLongTermGoal, longTermGoal, i, e.target.value)} className={cn("bg-transparent border-none text-sm w-full text-text-secondary min-h-[20px] transition-all", !isEditing ? "pointer-events-none" : "focus:text-text-primary outline-none")} />
-                    </div>
-                  ))}
+                <div className="space-y-2">
+                  {isEditing ? (
+                    activeGoalsList.filter(g => g.type === 'LONG_TERM' && g.status !== 'DONE').length === 0 ? (
+                      <p className="text-xs text-text-tertiary italic">No active long-term goals. Set some in the Goals Dashboard.</p>
+                    ) : (
+                      activeGoalsList.filter(g => g.type === 'LONG_TERM' && g.status !== 'DONE').map(goal => (
+                        <label key={goal.id} className="flex items-center gap-3 p-2 bg-input-bg/40 border border-border/40 hover:border-brand/35 rounded-xl cursor-pointer transition-all">
+                          <input 
+                            type="checkbox"
+                            checked={selectedGoalIds.includes(goal.id)}
+                            onChange={() => handleToggleGoal(goal.id)}
+                            className="rounded border-border text-brand focus:ring-brand"
+                          />
+                          <span className={cn("text-xs font-medium text-text-secondary", selectedGoalIds.includes(goal.id) && "text-brand font-bold")}>{goal.title}</span>
+                        </label>
+                      ))
+                    )
+                  ) : (
+                    (journal?.fullData?.goals || []).filter(g => g.type === 'LONG_TERM').length === 0 ? (
+                      <p className="text-xs text-text-tertiary italic">No long-term goals linked.</p>
+                    ) : (
+                      (journal?.fullData?.goals || []).filter(g => g.type === 'LONG_TERM').map(goal => (
+                        <div key={goal.id} className="flex items-center gap-2.5 p-2 bg-input-bg/30 border border-border/40 rounded-xl">
+                          <div className="w-1.5 h-1.5 rounded-full bg-brand shrink-0" />
+                          <span className="text-xs text-text-secondary font-medium">{goal.title}</span>
+                        </div>
+                      ))
+                    )
+                  )}
                 </div>
-                {isEditing && (
-                  <button onClick={() => addToArray(setLongTermGoal, longTermGoal)} className="mt-4 flex items-center gap-2 text-xs text-text-tertiary hover:text-text-primary transition-colors">
-                    <Plus size={14} /> Add vision
-                  </button>
-                )}
               </GoalCard>
             </section>
 
