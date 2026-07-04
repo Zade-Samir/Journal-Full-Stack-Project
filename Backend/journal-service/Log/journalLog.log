@@ -1,0 +1,432 @@
+2026-04-14 20:26:46 - Starting JournalServiceApplication using Java 17.0.18 with PID 14310 (/Users/samirzade/Downloads/Codes/Journal/FullStack/Backend/journal-service/target/classes started by samirzade in /Users/samirzade/Downloads/Codes/Journal/FullStack/Backend)
+2026-04-14 20:26:46 - Running with Spring Boot v3.2.5, Spring v6.1.6
+2026-04-14 20:26:46 - No active profile set, falling back to 1 default profile: "default"
+2026-04-14 20:26:47 - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-14 20:26:47 - Finished Spring Data repository scanning in 90 ms. Found 1 JPA repository interface.
+2026-04-14 20:26:47 - BeanFactory id=384d8cb5-edc7-30e2-b51d-c81696a0ffcd
+2026-04-14 20:26:48 - Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration$DeferringLoadBalancerInterceptorConfig' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration$DeferringLoadBalancerInterceptorConfig] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [lbRestClientPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2026-04-14 20:26:48 - Bean 'deferringLoadBalancerInterceptor' of type [org.springframework.cloud.client.loadbalancer.DeferringLoadBalancerInterceptor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-04-14 20:26:48 - Tomcat initialized with port 8081 (http)
+2026-04-14 20:26:48 - Starting service [Tomcat]
+2026-04-14 20:26:48 - Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-04-14 20:26:48 - Initializing Spring embedded WebApplicationContext
+2026-04-14 20:26:48 - Root WebApplicationContext: initialization completed in 1395 ms
+2026-04-14 20:26:48 - Filter 'gatewayAuthenticationFilter' configured for use
+2026-04-14 20:26:48 - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-04-14 20:26:48 - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-04-14 20:26:48 - HHH000026: Second-level cache disabled
+2026-04-14 20:26:48 - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-14 20:26:48 - journalDB - Starting...
+2026-04-14 20:26:48 - journalDB - Added connection com.mysql.cj.jdbc.ConnectionImpl@422ba9b7
+2026-04-14 20:26:48 - journalDB - Start completed.
+2026-04-14 20:26:49 - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-14 20:26:49 - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-14 20:26:49 - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-04-14 20:26:49 - 
+
+Using generated security password: e0b45459-8dd5-473e-9fa4-a61122b40b65
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-04-14 20:26:50 - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@20bc3e7f, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@7959fbe3, org.springframework.security.web.context.SecurityContextHolderFilter@283595db, org.springframework.security.web.header.HeaderWriterFilter@66075347, org.springframework.web.filter.CorsFilter@75c0e6be, org.springframework.security.web.authentication.logout.LogoutFilter@74b13aa, com.example.journal_service.config.GatewayAuthenticationFilter@78c262ba, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@6238b10a, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@225b460a, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@3dfe520, org.springframework.security.web.access.ExceptionTranslationFilter@6a450cb5, org.springframework.security.web.access.intercept.AuthorizationFilter@63574d76]
+2026-04-14 20:26:50 - Eureka HTTP Client uses RestTemplate.
+2026-04-14 20:26:50 - Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2026-04-14 20:26:50 - Setting initial instance status as: STARTING
+2026-04-14 20:26:50 - Initializing Eureka in region us-east-1
+2026-04-14 20:26:50 - Resolving eureka endpoints via configuration
+2026-04-14 20:26:50 - Disable delta property : false
+2026-04-14 20:26:50 - Single vip registry refresh property : null
+2026-04-14 20:26:50 - Force full registry fetch : false
+2026-04-14 20:26:50 - Application is null : false
+2026-04-14 20:26:50 - Registered Applications size is zero : true
+2026-04-14 20:26:50 - Application version is -1: true
+2026-04-14 20:26:50 - Getting all instance registry info from the eureka server
+2026-04-14 20:26:50 - The response status is 200
+2026-04-14 20:26:50 - Starting heartbeat executor: renew interval is: 30
+2026-04-14 20:26:50 - InstanceInfoReplicator onDemand update allowed rate per min is 4
+2026-04-14 20:26:50 - Discovery Client initialized at timestamp 1776178610837 with initial instances count: 0
+2026-04-14 20:26:50 - Registering application JOURNAL-SERVICE with eureka with status UP
+2026-04-14 20:26:50 - Saw local status change event StatusChangeEvent [timestamp=1776178610846, current=UP, previous=STARTING]
+2026-04-14 20:26:50 - DiscoveryClient_JOURNAL-SERVICE/192.168.1.9:journal-service:8081: registering service...
+2026-04-14 20:26:50 - Tomcat started on port 8081 (http) with context path ''
+2026-04-14 20:26:50 - Updating port to 8081
+2026-04-14 20:26:50 - DiscoveryClient_JOURNAL-SERVICE/192.168.1.9:journal-service:8081 - registration status: 204
+2026-04-14 20:26:50 - Started JournalServiceApplication in 4.388 seconds (process running for 4.737)
+2026-04-14 20:27:20 - Disable delta property : false
+2026-04-14 20:27:20 - Single vip registry refresh property : null
+2026-04-14 20:27:20 - Force full registry fetch : false
+2026-04-14 20:27:20 - Application is null : false
+2026-04-14 20:27:20 - Registered Applications size is zero : true
+2026-04-14 20:27:20 - Application version is -1: false
+2026-04-14 20:27:20 - Getting all instance registry info from the eureka server
+2026-04-14 20:27:20 - The response status is 200
+2026-04-14 20:29:12 - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-14 20:29:12 - Initializing Servlet 'dispatcherServlet'
+2026-04-14 20:29:12 - Completed initialization in 4 ms
+2026-04-14 20:29:12 - API HIT: Getting all journals for user: samzade786@gmail.com
+2026-04-14 20:29:12 - Fetching journals for user: samzade786@gmail.com with role: ROLE_USER
+2026-04-14 20:29:12 - User access - fetching own journals only
+2026-04-14 20:29:12 - API HIT: Getting all journals for user: samzade786@gmail.com
+2026-04-14 20:29:12 - Fetching journals for user: samzade786@gmail.com with role: ROLE_USER
+2026-04-14 20:29:12 - User access - fetching own journals only
+2026-04-14 20:29:29 - API HIT: Getting today's Journal for user: samzade786@gmail.com
+2026-04-14 20:29:29 - Fetching today's journal for user: samzade786@gmail.com
+2026-04-14 20:29:29 - No journal found for user: samzade786@gmail.com on date: 2026-04-14
+2026-04-14 20:29:29 - API HIT: Getting today's Journal for user: samzade786@gmail.com
+2026-04-14 20:29:29 - Fetching today's journal for user: samzade786@gmail.com
+2026-04-14 20:29:29 - No journal found for user: samzade786@gmail.com on date: 2026-04-14
+2026-04-14 20:29:43 - API HIT: Getting all journals for user: samzade786@gmail.com
+2026-04-14 20:29:43 - Fetching journals for user: samzade786@gmail.com with role: ROLE_USER
+2026-04-14 20:29:43 - User access - fetching own journals only
+2026-04-14 20:29:43 - API HIT: Getting all journals for user: samzade786@gmail.com
+2026-04-14 20:29:43 - Fetching journals for user: samzade786@gmail.com with role: ROLE_USER
+2026-04-14 20:29:43 - User access - fetching own journals only
+2026-04-14 20:29:45 - API HIT: Getting today's Journal for user: samzade786@gmail.com
+2026-04-14 20:29:45 - Fetching today's journal for user: samzade786@gmail.com
+2026-04-14 20:29:45 - No journal found for user: samzade786@gmail.com on date: 2026-04-14
+2026-04-14 20:29:45 - API HIT: Getting today's Journal for user: samzade786@gmail.com
+2026-04-14 20:29:45 - Fetching today's journal for user: samzade786@gmail.com
+2026-04-14 20:29:45 - No journal found for user: samzade786@gmail.com on date: 2026-04-14
+2026-04-14 20:29:55 - API HIT: Auto-saving journal for user: samzade786@gmail.com
+2026-04-14 20:29:55 - Auto-saving journal for user: samzade786@gmail.com
+2026-04-14 20:29:55 - Auto-saving journal successfully for user: samzade786@gmail.com
+2026-04-14 20:30:38 - API HIT: Auto-saving journal for user: samzade786@gmail.com
+2026-04-14 20:30:38 - Auto-saving journal for user: samzade786@gmail.com
+2026-04-14 20:30:38 - Auto-saving journal successfully for user: samzade786@gmail.com
+2026-04-14 20:31:50 - Resolving eureka endpoints via configuration
+2026-04-14 20:35:22 - API HIT: Getting all journals for user: samzade786@gmail.com
+2026-04-14 20:35:22 - Fetching journals for user: samzade786@gmail.com with role: ROLE_USER
+2026-04-14 20:35:22 - User access - fetching own journals only
+2026-04-14 20:35:22 - API HIT: Getting all journals for user: samzade786@gmail.com
+2026-04-14 20:35:22 - Fetching journals for user: samzade786@gmail.com with role: ROLE_USER
+2026-04-14 20:35:22 - User access - fetching own journals only
+2026-04-14 20:36:36 - Deleting journal for user: samzade786@gmail.com with role: ROLE_USER
+2026-04-14 20:36:36 - Delete request for journalId: 48 by user: samzade786@gmail.com with role: ROLE_USER
+2026-04-14 20:36:36 - Journal soft deleted successfully for user: samzade786@gmail.com
+2026-04-14 20:36:50 - Resolving eureka endpoints via configuration
+2026-04-14 20:36:58 - API HIT: Getting today's Journal for user: samzade786@gmail.com
+2026-04-14 20:36:58 - Fetching today's journal for user: samzade786@gmail.com
+2026-04-14 20:36:58 - No journal found for user: samzade786@gmail.com on date: 2026-04-14
+2026-04-14 20:36:58 - API HIT: Getting today's Journal for user: samzade786@gmail.com
+2026-04-14 20:36:58 - Fetching today's journal for user: samzade786@gmail.com
+2026-04-14 20:36:58 - No journal found for user: samzade786@gmail.com on date: 2026-04-14
+2026-04-14 20:37:06 - API HIT: Auto-saving journal for user: samzade786@gmail.com
+2026-04-14 20:37:06 - Auto-saving journal for user: samzade786@gmail.com
+2026-04-14 20:37:06 - Auto-saving journal successfully for user: samzade786@gmail.com
+2026-04-14 20:37:06 - API HIT: Getting all journals for user: samzade786@gmail.com
+2026-04-14 20:37:06 - Fetching journals for user: samzade786@gmail.com with role: ROLE_USER
+2026-04-14 20:37:06 - User access - fetching own journals only
+2026-04-14 20:37:06 - API HIT: Getting all journals for user: samzade786@gmail.com
+2026-04-14 20:37:06 - Fetching journals for user: samzade786@gmail.com with role: ROLE_USER
+2026-04-14 20:37:06 - User access - fetching own journals only
+2026-04-14 20:37:10 - API HIT: Getting today's Journal for user: samzade786@gmail.com
+2026-04-14 20:37:10 - Fetching today's journal for user: samzade786@gmail.com
+2026-04-14 20:37:10 - API HIT: Getting today's Journal for user: samzade786@gmail.com
+2026-04-14 20:37:10 - Fetching today's journal for user: samzade786@gmail.com
+2026-04-14 20:37:13 - API HIT: Getting all journals for user: samzade786@gmail.com
+2026-04-14 20:37:13 - Fetching journals for user: samzade786@gmail.com with role: ROLE_USER
+2026-04-14 20:37:13 - User access - fetching own journals only
+2026-04-14 20:37:13 - API HIT: Getting all journals for user: samzade786@gmail.com
+2026-04-14 20:37:13 - Fetching journals for user: samzade786@gmail.com with role: ROLE_USER
+2026-04-14 20:37:13 - User access - fetching own journals only
+2026-04-14 20:37:16 - API HIT: Getting today's Journal for user: samzade786@gmail.com
+2026-04-14 20:37:16 - Fetching today's journal for user: samzade786@gmail.com
+2026-04-14 20:37:16 - API HIT: Getting today's Journal for user: samzade786@gmail.com
+2026-04-14 20:37:16 - Fetching today's journal for user: samzade786@gmail.com
+2026-04-14 20:37:19 - API HIT: Getting all journals for user: samzade786@gmail.com
+2026-04-14 20:37:19 - Fetching journals for user: samzade786@gmail.com with role: ROLE_USER
+2026-04-14 20:37:19 - User access - fetching own journals only
+2026-04-14 20:37:19 - API HIT: Getting all journals for user: samzade786@gmail.com
+2026-04-14 20:37:19 - Fetching journals for user: samzade786@gmail.com with role: ROLE_USER
+2026-04-14 20:37:19 - User access - fetching own journals only
+2026-04-14 20:37:22 - API HIT: Getting today's Journal for user: samzade786@gmail.com
+2026-04-14 20:37:22 - Fetching today's journal for user: samzade786@gmail.com
+2026-04-14 20:37:55 - API HIT: Getting today's Journal for user: samzade786@gmail.com
+2026-04-14 20:37:55 - Fetching today's journal for user: samzade786@gmail.com
+2026-04-14 20:37:55 - API HIT: Getting today's Journal for user: samzade786@gmail.com
+2026-04-14 20:37:55 - Fetching today's journal for user: samzade786@gmail.com
+2026-04-14 20:38:22 - API HIT: Getting all journals for user: samir@zade.com
+2026-04-14 20:38:22 - Fetching journals for user: samir@zade.com with role: ROLE_USER
+2026-04-14 20:38:22 - User access - fetching own journals only
+2026-04-14 20:38:22 - API HIT: Getting all journals for user: samir@zade.com
+2026-04-14 20:38:22 - Fetching journals for user: samir@zade.com with role: ROLE_USER
+2026-04-14 20:38:22 - User access - fetching own journals only
+2026-04-14 20:38:52 - API HIT: Getting today's Journal for user: samir@zade.com
+2026-04-14 20:38:52 - Fetching today's journal for user: samir@zade.com
+2026-04-14 20:38:52 - No journal found for user: samir@zade.com on date: 2026-04-14
+2026-04-14 20:38:52 - API HIT: Getting today's Journal for user: samir@zade.com
+2026-04-14 20:38:52 - Fetching today's journal for user: samir@zade.com
+2026-04-14 20:38:52 - No journal found for user: samir@zade.com on date: 2026-04-14
+2026-04-14 20:38:55 - API HIT: Getting all journals for user: samir@zade.com
+2026-04-14 20:38:55 - Fetching journals for user: samir@zade.com with role: ROLE_USER
+2026-04-14 20:38:55 - User access - fetching own journals only
+2026-04-14 20:38:56 - API HIT: Getting all journals for user: samir@zade.com
+2026-04-14 20:38:56 - Fetching journals for user: samir@zade.com with role: ROLE_USER
+2026-04-14 20:38:56 - User access - fetching own journals only
+2026-04-14 20:41:50 - Resolving eureka endpoints via configuration
+2026-04-14 20:46:50 - Resolving eureka endpoints via configuration
+2026-04-14 20:50:58 - Unregistering application JOURNAL-SERVICE with eureka with status DOWN
+2026-04-14 20:50:58 - Saw local status change event StatusChangeEvent [timestamp=1776180058449, current=DOWN, previous=UP]
+2026-04-14 20:50:58 - DiscoveryClient_JOURNAL-SERVICE/192.168.1.9:journal-service:8081: registering service...
+2026-04-14 20:50:58 - Request execution error. endpoint=DefaultEndpoint{ serviceUrl='http://localhost:8761/eureka/} exception=I/O error on POST request for "http://localhost:8761/eureka/apps/JOURNAL-SERVICE": localhost:8761 failed to respond stacktrace=org.springframework.web.client.ResourceAccessException: I/O error on POST request for "http://localhost:8761/eureka/apps/JOURNAL-SERVICE": localhost:8761 failed to respond
+	at org.springframework.web.client.RestTemplate.createResourceAccessException(RestTemplate.java:915)
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:895)
+	at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:790)
+	at org.springframework.web.client.RestTemplate.exchange(RestTemplate.java:672)
+	at org.springframework.cloud.netflix.eureka.http.RestTemplateEurekaHttpClient.register(RestTemplateEurekaHttpClient.java:77)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$1.execute(EurekaHttpClientDecorator.java:59)
+	at com.netflix.discovery.shared.transport.decorator.RedirectingEurekaHttpClient.execute(RedirectingEurekaHttpClient.java:91)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$1.execute(EurekaHttpClientDecorator.java:59)
+	at com.netflix.discovery.shared.transport.decorator.RetryableEurekaHttpClient.execute(RetryableEurekaHttpClient.java:120)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$1.execute(EurekaHttpClientDecorator.java:59)
+	at com.netflix.discovery.shared.transport.decorator.SessionedEurekaHttpClient.execute(SessionedEurekaHttpClient.java:77)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56)
+	at com.netflix.discovery.DiscoveryClient.register(DiscoveryClient.java:820)
+	at com.netflix.discovery.InstanceInfoReplicator.run(InstanceInfoReplicator.java:121)
+	at com.netflix.discovery.InstanceInfoReplicator$1.run(InstanceInfoReplicator.java:101)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: org.apache.hc.core5.http.NoHttpResponseException: localhost:8761 failed to respond
+	at org.apache.hc.core5.http.impl.io.DefaultBHttpClientConnection.receiveResponseHeader(DefaultBHttpClientConnection.java:301)
+	at org.apache.hc.core5.http.impl.io.HttpRequestExecutor.execute(HttpRequestExecutor.java:175)
+	at org.apache.hc.core5.http.impl.io.HttpRequestExecutor.execute(HttpRequestExecutor.java:218)
+	at org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager$InternalConnectionEndpoint.execute(PoolingHttpClientConnectionManager.java:712)
+	at org.apache.hc.client5.http.impl.classic.InternalExecRuntime.execute(InternalExecRuntime.java:216)
+	at org.apache.hc.client5.http.impl.classic.MainClientExec.execute(MainClientExec.java:116)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.ConnectExec.execute(ConnectExec.java:188)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.ProtocolExec.execute(ProtocolExec.java:192)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.HttpRequestRetryExec.execute(HttpRequestRetryExec.java:96)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.ContentCompressionExec.execute(ContentCompressionExec.java:152)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.RedirectExec.execute(RedirectExec.java:115)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.InternalHttpClient.doExecute(InternalHttpClient.java:170)
+	at org.apache.hc.client5.http.impl.classic.CloseableHttpClient.execute(CloseableHttpClient.java:87)
+	at org.apache.hc.client5.http.impl.classic.CloseableHttpClient.execute(CloseableHttpClient.java:55)
+	at org.apache.hc.client5.http.classic.HttpClient.executeOpen(HttpClient.java:183)
+	at org.springframework.http.client.HttpComponentsClientHttpRequest.executeInternal(HttpComponentsClientHttpRequest.java:95)
+	at org.springframework.http.client.AbstractStreamingClientHttpRequest.executeInternal(AbstractStreamingClientHttpRequest.java:70)
+	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:66)
+	at org.springframework.http.client.InterceptingClientHttpRequest$InterceptingRequestExecution.execute(InterceptingClientHttpRequest.java:112)
+	at org.springframework.cloud.netflix.eureka.http.RestTemplateTransportClientFactory.lambda$restTemplate$0(RestTemplateTransportClientFactory.java:143)
+	at org.springframework.http.client.InterceptingClientHttpRequest$InterceptingRequestExecution.execute(InterceptingClientHttpRequest.java:88)
+	at org.springframework.http.client.InterceptingClientHttpRequest.executeInternal(InterceptingClientHttpRequest.java:72)
+	at org.springframework.http.client.AbstractBufferingClientHttpRequest.executeInternal(AbstractBufferingClientHttpRequest.java:48)
+	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:66)
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:889)
+	... 21 more
+
+2026-04-14 20:50:58 - Request execution failed with message: I/O error on POST request for "http://localhost:8761/eureka/apps/JOURNAL-SERVICE": localhost:8761 failed to respond
+2026-04-14 20:50:58 - Request execution error. endpoint=DefaultEndpoint{ serviceUrl='http://localhost:8761/eureka/}, exception=I/O error on POST request for "http://localhost:8761/eureka/apps/JOURNAL-SERVICE": localhost:8761 failed to respond stacktrace=org.springframework.web.client.ResourceAccessException: I/O error on POST request for "http://localhost:8761/eureka/apps/JOURNAL-SERVICE": localhost:8761 failed to respond
+	at org.springframework.web.client.RestTemplate.createResourceAccessException(RestTemplate.java:915)
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:895)
+	at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:790)
+	at org.springframework.web.client.RestTemplate.exchange(RestTemplate.java:672)
+	at org.springframework.cloud.netflix.eureka.http.RestTemplateEurekaHttpClient.register(RestTemplateEurekaHttpClient.java:77)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$1.execute(EurekaHttpClientDecorator.java:59)
+	at com.netflix.discovery.shared.transport.decorator.RedirectingEurekaHttpClient.executeOnNewServer(RedirectingEurekaHttpClient.java:121)
+	at com.netflix.discovery.shared.transport.decorator.RedirectingEurekaHttpClient.execute(RedirectingEurekaHttpClient.java:80)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$1.execute(EurekaHttpClientDecorator.java:59)
+	at com.netflix.discovery.shared.transport.decorator.RetryableEurekaHttpClient.execute(RetryableEurekaHttpClient.java:120)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$1.execute(EurekaHttpClientDecorator.java:59)
+	at com.netflix.discovery.shared.transport.decorator.SessionedEurekaHttpClient.execute(SessionedEurekaHttpClient.java:77)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56)
+	at com.netflix.discovery.DiscoveryClient.register(DiscoveryClient.java:820)
+	at com.netflix.discovery.InstanceInfoReplicator.run(InstanceInfoReplicator.java:121)
+	at com.netflix.discovery.InstanceInfoReplicator$1.run(InstanceInfoReplicator.java:101)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: org.apache.hc.core5.http.NoHttpResponseException: localhost:8761 failed to respond
+	at org.apache.hc.core5.http.impl.io.DefaultBHttpClientConnection.receiveResponseHeader(DefaultBHttpClientConnection.java:301)
+	at org.apache.hc.core5.http.impl.io.HttpRequestExecutor.execute(HttpRequestExecutor.java:175)
+	at org.apache.hc.core5.http.impl.io.HttpRequestExecutor.execute(HttpRequestExecutor.java:218)
+	at org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager$InternalConnectionEndpoint.execute(PoolingHttpClientConnectionManager.java:712)
+	at org.apache.hc.client5.http.impl.classic.InternalExecRuntime.execute(InternalExecRuntime.java:216)
+	at org.apache.hc.client5.http.impl.classic.MainClientExec.execute(MainClientExec.java:116)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.ConnectExec.execute(ConnectExec.java:188)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.ProtocolExec.execute(ProtocolExec.java:192)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.HttpRequestRetryExec.execute(HttpRequestRetryExec.java:96)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.ContentCompressionExec.execute(ContentCompressionExec.java:152)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.RedirectExec.execute(RedirectExec.java:115)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.InternalHttpClient.doExecute(InternalHttpClient.java:170)
+	at org.apache.hc.client5.http.impl.classic.CloseableHttpClient.execute(CloseableHttpClient.java:87)
+	at org.apache.hc.client5.http.impl.classic.CloseableHttpClient.execute(CloseableHttpClient.java:55)
+	at org.apache.hc.client5.http.classic.HttpClient.executeOpen(HttpClient.java:183)
+	at org.springframework.http.client.HttpComponentsClientHttpRequest.executeInternal(HttpComponentsClientHttpRequest.java:95)
+	at org.springframework.http.client.AbstractStreamingClientHttpRequest.executeInternal(AbstractStreamingClientHttpRequest.java:70)
+	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:66)
+	at org.springframework.http.client.InterceptingClientHttpRequest$InterceptingRequestExecution.execute(InterceptingClientHttpRequest.java:112)
+	at org.springframework.cloud.netflix.eureka.http.RestTemplateTransportClientFactory.lambda$restTemplate$0(RestTemplateTransportClientFactory.java:143)
+	at org.springframework.http.client.InterceptingClientHttpRequest$InterceptingRequestExecution.execute(InterceptingClientHttpRequest.java:88)
+	at org.springframework.http.client.InterceptingClientHttpRequest.executeInternal(InterceptingClientHttpRequest.java:72)
+	at org.springframework.http.client.AbstractBufferingClientHttpRequest.executeInternal(AbstractBufferingClientHttpRequest.java:48)
+	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:66)
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:889)
+	... 22 more
+
+2026-04-14 20:50:58 - Request execution failed with message: I/O error on POST request for "http://localhost:8761/eureka/apps/JOURNAL-SERVICE": localhost:8761 failed to respond
+2026-04-14 20:50:58 - DiscoveryClient_JOURNAL-SERVICE/192.168.1.9:journal-service:8081 - registration failed Cannot execute request on any known server
+com.netflix.discovery.shared.transport.TransportException: Cannot execute request on any known server
+	at com.netflix.discovery.shared.transport.decorator.RetryableEurekaHttpClient.execute(RetryableEurekaHttpClient.java:112)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$1.execute(EurekaHttpClientDecorator.java:59)
+	at com.netflix.discovery.shared.transport.decorator.SessionedEurekaHttpClient.execute(SessionedEurekaHttpClient.java:77)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56)
+	at com.netflix.discovery.DiscoveryClient.register(DiscoveryClient.java:820)
+	at com.netflix.discovery.InstanceInfoReplicator.run(InstanceInfoReplicator.java:121)
+	at com.netflix.discovery.InstanceInfoReplicator$1.run(InstanceInfoReplicator.java:101)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+2026-04-14 20:50:58 - There was a problem with the instance info replicator
+com.netflix.discovery.shared.transport.TransportException: Cannot execute request on any known server
+	at com.netflix.discovery.shared.transport.decorator.RetryableEurekaHttpClient.execute(RetryableEurekaHttpClient.java:112)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$1.execute(EurekaHttpClientDecorator.java:59)
+	at com.netflix.discovery.shared.transport.decorator.SessionedEurekaHttpClient.execute(SessionedEurekaHttpClient.java:77)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56)
+	at com.netflix.discovery.DiscoveryClient.register(DiscoveryClient.java:820)
+	at com.netflix.discovery.InstanceInfoReplicator.run(InstanceInfoReplicator.java:121)
+	at com.netflix.discovery.InstanceInfoReplicator$1.run(InstanceInfoReplicator.java:101)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+2026-04-14 20:51:09 - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-14 20:51:09 - journalDB - Shutdown initiated...
+2026-04-14 20:51:09 - journalDB - Shutdown completed.
+2026-04-14 20:51:09 - Shutting down DiscoveryClient ...
+2026-04-14 20:51:12 - Unregistering ...
+2026-04-14 20:51:12 - Request execution error. endpoint=DefaultEndpoint{ serviceUrl='http://localhost:8761/eureka/}, exception=Connection pool shut down stacktrace=java.lang.IllegalStateException: Connection pool shut down
+	at org.apache.hc.core5.util.Asserts.check(Asserts.java:38)
+	at org.apache.hc.core5.pool.StrictConnPool.lease(StrictConnPool.java:176)
+	at org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager.lease(PoolingHttpClientConnectionManager.java:298)
+	at org.apache.hc.client5.http.impl.classic.InternalExecRuntime.acquireEndpoint(InternalExecRuntime.java:103)
+	at org.apache.hc.client5.http.impl.classic.ConnectExec.execute(ConnectExec.java:125)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.ProtocolExec.execute(ProtocolExec.java:192)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.HttpRequestRetryExec.execute(HttpRequestRetryExec.java:96)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.ContentCompressionExec.execute(ContentCompressionExec.java:152)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.RedirectExec.execute(RedirectExec.java:115)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.InternalHttpClient.doExecute(InternalHttpClient.java:170)
+	at org.apache.hc.client5.http.impl.classic.CloseableHttpClient.execute(CloseableHttpClient.java:87)
+	at org.apache.hc.client5.http.impl.classic.CloseableHttpClient.execute(CloseableHttpClient.java:55)
+	at org.apache.hc.client5.http.classic.HttpClient.executeOpen(HttpClient.java:183)
+	at org.springframework.http.client.HttpComponentsClientHttpRequest.executeInternal(HttpComponentsClientHttpRequest.java:95)
+	at org.springframework.http.client.AbstractStreamingClientHttpRequest.executeInternal(AbstractStreamingClientHttpRequest.java:70)
+	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:66)
+	at org.springframework.http.client.InterceptingClientHttpRequest$InterceptingRequestExecution.execute(InterceptingClientHttpRequest.java:112)
+	at org.springframework.cloud.netflix.eureka.http.RestTemplateTransportClientFactory.lambda$restTemplate$0(RestTemplateTransportClientFactory.java:143)
+	at org.springframework.http.client.InterceptingClientHttpRequest$InterceptingRequestExecution.execute(InterceptingClientHttpRequest.java:88)
+	at org.springframework.http.client.InterceptingClientHttpRequest.executeInternal(InterceptingClientHttpRequest.java:72)
+	at org.springframework.http.client.AbstractBufferingClientHttpRequest.executeInternal(AbstractBufferingClientHttpRequest.java:48)
+	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:66)
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:889)
+	at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:790)
+	at org.springframework.web.client.RestTemplate.exchange(RestTemplate.java:672)
+	at org.springframework.cloud.netflix.eureka.http.RestTemplateEurekaHttpClient.cancel(RestTemplateEurekaHttpClient.java:87)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$2.execute(EurekaHttpClientDecorator.java:74)
+	at com.netflix.discovery.shared.transport.decorator.RedirectingEurekaHttpClient.executeOnNewServer(RedirectingEurekaHttpClient.java:121)
+	at com.netflix.discovery.shared.transport.decorator.RedirectingEurekaHttpClient.execute(RedirectingEurekaHttpClient.java:80)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.cancel(EurekaHttpClientDecorator.java:71)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$2.execute(EurekaHttpClientDecorator.java:74)
+	at com.netflix.discovery.shared.transport.decorator.RetryableEurekaHttpClient.execute(RetryableEurekaHttpClient.java:120)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.cancel(EurekaHttpClientDecorator.java:71)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$2.execute(EurekaHttpClientDecorator.java:74)
+	at com.netflix.discovery.shared.transport.decorator.SessionedEurekaHttpClient.execute(SessionedEurekaHttpClient.java:77)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.cancel(EurekaHttpClientDecorator.java:71)
+	at com.netflix.discovery.DiscoveryClient.unregister(DiscoveryClient.java:916)
+	at com.netflix.discovery.DiscoveryClient.shutdown(DiscoveryClient.java:892)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.springframework.beans.factory.annotation.InitDestroyAnnotationBeanPostProcessor$LifecycleMethod.invoke(InitDestroyAnnotationBeanPostProcessor.java:457)
+	at org.springframework.beans.factory.annotation.InitDestroyAnnotationBeanPostProcessor$LifecycleMetadata.invokeDestroyMethods(InitDestroyAnnotationBeanPostProcessor.java:415)
+	at org.springframework.beans.factory.annotation.InitDestroyAnnotationBeanPostProcessor.postProcessBeforeDestruction(InitDestroyAnnotationBeanPostProcessor.java:239)
+	at org.springframework.beans.factory.support.DisposableBeanAdapter.destroy(DisposableBeanAdapter.java:202)
+	at org.springframework.beans.factory.support.DisposableBeanAdapter.run(DisposableBeanAdapter.java:195)
+	at org.springframework.cloud.context.scope.GenericScope$BeanLifecycleWrapper.destroy(GenericScope.java:389)
+	at org.springframework.cloud.context.scope.GenericScope.destroy(GenericScope.java:136)
+	at org.springframework.beans.factory.support.DisposableBeanAdapter.destroy(DisposableBeanAdapter.java:211)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.destroyBean(DefaultSingletonBeanRegistry.java:587)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.destroySingleton(DefaultSingletonBeanRegistry.java:559)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.destroySingleton(DefaultListableBeanFactory.java:1202)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.destroySingletons(DefaultSingletonBeanRegistry.java:520)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.destroySingletons(DefaultListableBeanFactory.java:1195)
+	at org.springframework.context.support.AbstractApplicationContext.destroyBeans(AbstractApplicationContext.java:1186)
+	at org.springframework.context.support.AbstractApplicationContext.doClose(AbstractApplicationContext.java:1147)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.doClose(ServletWebServerApplicationContext.java:174)
+	at org.springframework.context.support.AbstractApplicationContext.close(AbstractApplicationContext.java:1093)
+	at org.springframework.boot.SpringApplicationShutdownHook.closeAndWait(SpringApplicationShutdownHook.java:145)
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75)
+	at org.springframework.boot.SpringApplicationShutdownHook.run(SpringApplicationShutdownHook.java:114)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+
+2026-04-14 20:51:12 - Request execution failed with message: Connection pool shut down
+2026-04-14 20:51:12 - DiscoveryClient_JOURNAL-SERVICE/192.168.1.9:journal-service:8081 - de-registration failedCannot execute request on any known server
+com.netflix.discovery.shared.transport.TransportException: Cannot execute request on any known server
+	at com.netflix.discovery.shared.transport.decorator.RetryableEurekaHttpClient.execute(RetryableEurekaHttpClient.java:112)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.cancel(EurekaHttpClientDecorator.java:71)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$2.execute(EurekaHttpClientDecorator.java:74)
+	at com.netflix.discovery.shared.transport.decorator.SessionedEurekaHttpClient.execute(SessionedEurekaHttpClient.java:77)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.cancel(EurekaHttpClientDecorator.java:71)
+	at com.netflix.discovery.DiscoveryClient.unregister(DiscoveryClient.java:916)
+	at com.netflix.discovery.DiscoveryClient.shutdown(DiscoveryClient.java:892)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.springframework.beans.factory.annotation.InitDestroyAnnotationBeanPostProcessor$LifecycleMethod.invoke(InitDestroyAnnotationBeanPostProcessor.java:457)
+	at org.springframework.beans.factory.annotation.InitDestroyAnnotationBeanPostProcessor$LifecycleMetadata.invokeDestroyMethods(InitDestroyAnnotationBeanPostProcessor.java:415)
+	at org.springframework.beans.factory.annotation.InitDestroyAnnotationBeanPostProcessor.postProcessBeforeDestruction(InitDestroyAnnotationBeanPostProcessor.java:239)
+	at org.springframework.beans.factory.support.DisposableBeanAdapter.destroy(DisposableBeanAdapter.java:202)
+	at org.springframework.beans.factory.support.DisposableBeanAdapter.run(DisposableBeanAdapter.java:195)
+	at org.springframework.cloud.context.scope.GenericScope$BeanLifecycleWrapper.destroy(GenericScope.java:389)
+	at org.springframework.cloud.context.scope.GenericScope.destroy(GenericScope.java:136)
+	at org.springframework.beans.factory.support.DisposableBeanAdapter.destroy(DisposableBeanAdapter.java:211)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.destroyBean(DefaultSingletonBeanRegistry.java:587)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.destroySingleton(DefaultSingletonBeanRegistry.java:559)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.destroySingleton(DefaultListableBeanFactory.java:1202)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.destroySingletons(DefaultSingletonBeanRegistry.java:520)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.destroySingletons(DefaultListableBeanFactory.java:1195)
+	at org.springframework.context.support.AbstractApplicationContext.destroyBeans(AbstractApplicationContext.java:1186)
+	at org.springframework.context.support.AbstractApplicationContext.doClose(AbstractApplicationContext.java:1147)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.doClose(ServletWebServerApplicationContext.java:174)
+	at org.springframework.context.support.AbstractApplicationContext.close(AbstractApplicationContext.java:1093)
+	at org.springframework.boot.SpringApplicationShutdownHook.closeAndWait(SpringApplicationShutdownHook.java:145)
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75)
+	at org.springframework.boot.SpringApplicationShutdownHook.run(SpringApplicationShutdownHook.java:114)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+2026-04-14 20:51:12 - Completed shut down of DiscoveryClient

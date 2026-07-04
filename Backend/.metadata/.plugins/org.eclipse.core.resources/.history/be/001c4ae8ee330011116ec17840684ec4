@@ -1,0 +1,83 @@
+package com.example.journal_service.mapper;
+
+import com.example.journal_service.Dto.JournalRequestDTO;
+import com.example.journal_service.entity.Journal;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.processing.Generated;
+import org.springframework.stereotype.Component;
+
+@Generated(
+    value = "org.mapstruct.ap.MappingProcessor",
+    date = "2026-04-09T14:01:08+0530",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.18 (Microsoft)"
+)
+@Component
+public class JournalMapperImpl implements JournalMapper {
+
+    @Override
+    public Journal toEntity(JournalRequestDTO dto) {
+        if ( dto == null ) {
+            return null;
+        }
+
+        Journal journal = new Journal();
+
+        journal.setUserId( dto.getUserId() );
+        journal.setDate( dto.getDate() );
+        journal.setWhatDidIDo( dto.getWhatDidIDo() );
+        journal.setBestMoment( dto.getBestMoment() );
+        journal.setWorstMoment( dto.getWorstMoment() );
+        journal.setWhatILearned( dto.getWhatILearned() );
+        List<String> list = dto.getGratitude();
+        if ( list != null ) {
+            journal.setGratitude( new ArrayList<String>( list ) );
+        }
+        List<String> list1 = dto.getShortTermGoal();
+        if ( list1 != null ) {
+            journal.setShortTermGoal( new ArrayList<String>( list1 ) );
+        }
+        List<String> list2 = dto.getLongTermGoal();
+        if ( list2 != null ) {
+            journal.setLongTermGoal( new ArrayList<String>( list2 ) );
+        }
+        journal.setWhatIDoForGoal( dto.getWhatIDoForGoal() );
+        journal.setFeeling( dto.getFeeling() );
+        journal.setFeelingNote( dto.getFeelingNote() );
+
+        return journal;
+    }
+
+    @Override
+    public JournalRequestDTO toDTO(Journal journal) {
+        if ( journal == null ) {
+            return null;
+        }
+
+        JournalRequestDTO journalRequestDTO = new JournalRequestDTO();
+
+        journalRequestDTO.setUserId( journal.getUserId() );
+        journalRequestDTO.setDate( journal.getDate() );
+        journalRequestDTO.setWhatDidIDo( journal.getWhatDidIDo() );
+        journalRequestDTO.setBestMoment( journal.getBestMoment() );
+        journalRequestDTO.setWorstMoment( journal.getWorstMoment() );
+        journalRequestDTO.setWhatILearned( journal.getWhatILearned() );
+        List<String> list = journal.getGratitude();
+        if ( list != null ) {
+            journalRequestDTO.setGratitude( new ArrayList<String>( list ) );
+        }
+        List<String> list1 = journal.getShortTermGoal();
+        if ( list1 != null ) {
+            journalRequestDTO.setShortTermGoal( new ArrayList<String>( list1 ) );
+        }
+        List<String> list2 = journal.getLongTermGoal();
+        if ( list2 != null ) {
+            journalRequestDTO.setLongTermGoal( new ArrayList<String>( list2 ) );
+        }
+        journalRequestDTO.setWhatIDoForGoal( journal.getWhatIDoForGoal() );
+        journalRequestDTO.setFeeling( journal.getFeeling() );
+        journalRequestDTO.setFeelingNote( journal.getFeelingNote() );
+
+        return journalRequestDTO;
+    }
+}
