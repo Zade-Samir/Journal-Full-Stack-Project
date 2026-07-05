@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Table(
         name = "goals",
         indexes = {
-                @Index(name = "idx_goal_user_id", columnList = "userId"),
+                @Index(name = "idx_goal_user_id", columnList = "user_id"),
                 @Index(name = "idx_goal_status", columnList = "status"),
                 @Index(name = "idx_goal_type", columnList = "type")
         }
@@ -26,23 +26,27 @@ public class Goal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @Column(nullable = false)
+    @Column(name = "title", nullable = false)
     private String title;
 
+    @Column(name = "target_date")
     private LocalDate targetDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private GoalStatus status = GoalStatus.NOT_STARTED;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "type", nullable = false)
     private GoalType type = GoalType.SHORT_TERM;
 
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @PrePersist

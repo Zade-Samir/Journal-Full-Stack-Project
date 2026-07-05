@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -59,6 +61,7 @@ public class JournalServiceImpl implements JournalService {
 
     //create the journal
     @Override
+    @CacheEvict(value = "todayJournals", key = "#userEmail")
     public JournalRequestDTO createJournal(String userEmail, JournalRequestDTO dto) {
 
         LOGGER.info("Creating journal for user: {}", userEmail);
@@ -88,6 +91,7 @@ public class JournalServiceImpl implements JournalService {
 
     //get today journal
     @Override
+    @Cacheable(value = "todayJournals", key = "#userEmail")
     public JournalRequestDTO getTodayJournal(String userEmail) {
 
         LOGGER.info("Fetching today's journal for user: {}", userEmail);
@@ -109,6 +113,7 @@ public class JournalServiceImpl implements JournalService {
 
     //update the journal
     @Override
+    @CacheEvict(value = "todayJournals", key = "#userEmail")
     public JournalRequestDTO updateJournal(Long journalId, String userEmail, JournalRequestDTO dto) {
 
         LOGGER.info("Updating journal ID: {} for user: {}", journalId, userEmail);
@@ -192,6 +197,7 @@ public class JournalServiceImpl implements JournalService {
 
     //auto saving the journal
     @Override
+    @CacheEvict(value = "todayJournals", key = "#userEmail")
     public JournalRequestDTO autoSaveJournal(String userEmail, JournalAutoSaveDTO dto) {
 
         LOGGER.info("Auto-saving journal for user: {}", userEmail);
