@@ -36,7 +36,8 @@ public class JwtAuthenticationFilter implements GlobalFilter {
                 path.equals("/auth/register") ||
                 path.equals("/auth/refresh") ||
                 path.equals("/auth/logout") ||
-                path.equals("/auth/verify") ||
+                path.equals("/auth/verify-otp") ||
+                path.equals("/auth/resend-otp") ||
                 path.startsWith("/auth/oauth2") ||
                 path.startsWith("/login/oauth2") ||
                 path.startsWith("/oauth2");

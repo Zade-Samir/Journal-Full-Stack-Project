@@ -120,7 +120,8 @@ export const VerifyOtp = () => {
       }
 
       setStatus('success');
-      setMessage('Your email has been verified successfully! You can now log in.');
+      setMessage('Your email has been verified successfully! Redirecting to login…');
+      setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
       setStatus('error');
       setMessage(err.message || 'Verification failed. Please try again.');
@@ -132,7 +133,7 @@ export const VerifyOtp = () => {
     if (otp.every(digit => digit !== '') && email && status !== 'success' && status !== 'verifying') {
       handleVerify();
     }
-  }, [otp, email]);
+  }, [otp]); // intentionally only depends on otp — adding email causes double-fires
 
   // Resend OTP function
   const handleResend = async () => {
