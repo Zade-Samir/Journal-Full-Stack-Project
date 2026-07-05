@@ -29,13 +29,56 @@ function Bullet({ text }) {
   );
 }
 
-export function JournalCard({ date, mood, fullData, className }) {
-  const { Icon, color } = moodIconMap[mood] || moodIconMap.neutral;
+export function JournalCard({ date, mood, fullData, onToggleStar, className }) {
   const d = fullData || {};
+  const { Icon, color } = moodIconMap[mood] || moodIconMap.neutral;
+  const isStarred = d.starred || false;
 
   const gratitude = (d.gratitude || []).filter(g => g?.trim());
   const shortGoals = (d.shortTermGoal || []).filter(g => g?.trim());
   const longGoals  = (d.longTermGoal  || []).filter(g => g?.trim());
+
+  // Calculate word count & reading time
+  const texts = [
+    d.whatDidIDo,
+    d.bestMoment,
+    d.worstMoment,
+    d.whatILearned,
+    d.whatIDoForGoal,
+    d.feelingNote,
+    ...gratitude,
+    ...shortGoals,
+    ...longGoals
+  ];
+  const combinedText = texts.filter(t => typeof t === 'string' && t.trim()).join(' ');
+  const words = combinedText.trim().split(/\s+/).filter(w => w.length > 0);
+  const wordCount = words.length;
+  const readingTime = Math.max(1, Math.round(wordCount / 200));
+
+  const handleStarClick = async (e) => {
+    e.stopPropagation();
+    try {
+      const token = localStorage.getItem('token');
+      const targetId = d.id;
+      if (!targetId && targetId !== 0) return;
+
+      const newStarred = !isStarred;
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/journal/${targetId}/star?starred=${newStarred}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        if (onToggleStar) {
+          onToggleStar(targetId, newStarred);
+        }
+      }
+    } catch (err) {
+      console.error("Error toggling star status", err);
+    }
+  };
 
   return (
     <div className={cn(
@@ -44,9 +87,26 @@ export function JournalCard({ date, mood, fullData, className }) {
     )}>
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-4">
-        <p className="text-[10px] font-bold text-text-secondary tracking-widest uppercase leading-tight">{date}</p>
-        <div className={cn('opacity-70 group-hover:opacity-100 transition-opacity shrink-0', color)}>
-          <Icon size={17} />
+        <div>
+          <p className="text-[10px] font-bold text-text-secondary tracking-widest uppercase leading-tight">{date}</p>
+          <p className="text-[9px] text-text-tertiary font-medium mt-1">
+            {wordCount} words · ~{readingTime} min read
+          </p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={handleStarClick}
+            className={cn(
+              "p-1.5 rounded-full transition-all hover:bg-black/10 dark:hover:bg-white/5",
+              isStarred ? "text-amber-400" : "text-text-tertiary md:opacity-0 md:group-hover:opacity-100 hover:text-text-secondary"
+            )}
+            title={isStarred ? "Unstar Entry" : "Star Entry"}
+          >
+            <Star size={14} fill={isStarred ? "currentColor" : "none"} />
+          </button>
+          <div className={cn('opacity-70 group-hover:opacity-100 transition-opacity', color)}>
+            <Icon size={17} />
+          </div>
         </div>
       </div>
 

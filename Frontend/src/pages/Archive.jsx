@@ -266,12 +266,17 @@ export function Archive() {
     // Mood
     if (moodFilter.length > 0) list = list.filter(j => moodFilter.includes(j.mood));
 
-    // Sort
-    list.sort((a, b) =>
-      sortOrder === 'newest'
+    // Sort: Starred first, then date
+    list.sort((a, b) => {
+      const aStarred = a.fullData?.starred || false;
+      const bStarred = b.fullData?.starred || false;
+      if (aStarred && !bStarred) return -1;
+      if (!aStarred && bStarred) return 1;
+
+      return sortOrder === 'newest'
         ? new Date(b.rawDate) - new Date(a.rawDate)
-        : new Date(a.rawDate) - new Date(b.rawDate)
-    );
+        : new Date(a.rawDate) - new Date(b.rawDate);
+    });
 
     return list;
   })();
@@ -439,15 +444,56 @@ export function Archive() {
             <p>No journals found. Take a note above, or create one for today!</p>
           </div>
         ) : processedJournals.length === 0 ? (
-          <div className="text-center py-20 text-text-tertiary">
-            <p className="mb-3">No journals match your current filters.</p>
-            <button onClick={clearAllFilters} className="text-sm text-brand hover:underline">Clear all filters</button>
+          <div className="flex flex-col items-center py-20 text-center gap-4">
+            <div className="h-14 w-14 rounded-full bg-input-bg border border-border flex items-center justify-center text-2xl">
+              {searchQuery ? '🔍' : '🗂️'}
+            </div>
+            {searchQuery ? (
+              <>
+                <div>
+                  <p className="text-text-primary font-semibold mb-1">No results for "{searchQuery}"</p>
+                  <p className="text-text-tertiary text-sm">Try a different keyword or check your spelling</p>
+                </div>
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="text-sm text-brand hover:underline font-medium"
+                >
+                  Clear search
+                </button>
+              </>
+            ) : (
+              <>
+                <div>
+                  <p className="text-text-primary font-semibold mb-1">No journals match your filters</p>
+                  <p className="text-text-tertiary text-sm">Try adjusting the date range, mood, or sort order</p>
+                </div>
+                <button onClick={clearAllFilters} className="text-sm text-brand hover:underline font-medium">
+                  Clear all filters
+                </button>
+              </>
+            )}
           </div>
         ) : (
           <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5 space-y-5">
             {processedJournals.map((entry) => (
               <div key={entry.id} className="break-inside-avoid" onClick={() => setSelectedJournal(entry)}>
-                <JournalCard {...entry} />
+                <JournalCard 
+                  {...entry} 
+                  onToggleStar={(id, newStarred) => {
+                    setJournals(prev => prev.map(j => {
+                      if (j.id === id) {
+                        return {
+                          ...j,
+                          fullData: {
+                            ...j.fullData,
+                            starred: newStarred
+                          }
+                        };
+                      }
+                      return j;
+                    }));
+                  }}
+                />
               </div>
             ))}
           </div>

@@ -295,6 +295,31 @@ public class JournalServiceImpl implements JournalService {
         return mapper.toDTO(saved);
     }
 
+    @Override
+    @Caching(evict = {
+        @CacheEvict(value = "todayJournals", key = "#userEmail"),
+        @CacheEvict(value = "journalStreaks", key = "#userEmail"),
+        @CacheEvict(value = "journalStats", allEntries = true),
+        @CacheEvict(value = "journalArchives", allEntries = true),
+        @CacheEvict(value = "reflectionSummaries", allEntries = true)
+    })
+    public JournalRequestDTO toggleStarJournal(Long journalId, String userEmail, boolean starred) {
+        LOGGER.info("Toggling star status of journal ID: {} to {} for user: {}", journalId, starred, userEmail);
+        Journal existingJournal = repo.findById(journalId)
+                .orElseThrow(() -> new ResourceNotFoundException("No journal found with journal Id"));
+
+        if (!existingJournal.getUserId().equals(userEmail)) {
+            LOGGER.error("Unauthorized star update attempt by user: {}", userEmail);
+            throw new UnauthorizedException("Unauthorized access!");
+        }
+
+        existingJournal.setStarred(starred);
+        existingJournal.setUpdatedAt(LocalDateTime.now());
+        Journal updated = repo.save(existingJournal);
+        return mapper.toDTO(updated);
+    }
+
+
 
     //get all journals
     @Override
@@ -322,6 +347,14 @@ public class JournalServiceImpl implements JournalService {
                 .map(
                         x -> mapper.toDTO(x)
                 );
+    }
+
+    @Override
+    public Page<JournalRequestDTO> searchJournals(String userEmail, String keyword, int page, int size) {
+        LOGGER.info("Searching journals for user: {} with keyword: {}", userEmail, keyword);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Journal> results = repo.searchByUserIdAndKeyword(userEmail, keyword, pageable);
+        return results.map(mapper::toDTO);
     }
 
     @Override

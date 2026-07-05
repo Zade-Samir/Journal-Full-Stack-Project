@@ -13,6 +13,7 @@ import com.samir.journal_service.mapper.JournalMapper;
 import com.samir.journal_service.repo.GoalRepo;
 import com.samir.journal_service.repo.JournalRepo;
 import com.samir.journal_service.service.GoalService;
+import com.samir.journal_service.service.ReminderEmailService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ public class GoalServiceImpl implements GoalService {
     private final GoalRepo goalRepo;
     private final JournalRepo journalRepo;
     private final JournalMapper mapper;
+    private final ReminderEmailService emailService;
 
     @Override
     public List<GoalDTO> getGoals(String userEmail, String statusFilter) {
@@ -87,6 +89,8 @@ public class GoalServiceImpl implements GoalService {
             throw new UnauthorizedException("Unauthorized access to this goal");
         }
 
+        GoalStatus oldStatus = existingGoal.getStatus();
+
         existingGoal.setTitle(dto.getTitle());
         existingGoal.setTargetDate(dto.getTargetDate());
         
@@ -104,6 +108,15 @@ public class GoalServiceImpl implements GoalService {
 
         Goal updated = goalRepo.save(existingGoal);
         LOGGER.info("Goal updated successfully for ID: {}", updated.getId());
+
+        if (oldStatus != GoalStatus.DONE && updated.getStatus() == GoalStatus.DONE) {
+            try {
+                emailService.sendGoalCompletionEmail(userEmail, updated.getTitle());
+            } catch (Exception e) {
+                LOGGER.error("Failed to send goal completion congratulatory email", e);
+            }
+        }
+
         return mapper.toGoalDTO(updated);
     }
 

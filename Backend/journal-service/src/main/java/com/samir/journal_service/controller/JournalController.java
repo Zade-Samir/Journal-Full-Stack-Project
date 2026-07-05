@@ -143,6 +143,27 @@ public class JournalController {
         );
     }
 
+    //Full-text search across journals
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<Page<JournalRequestDTO>>> searchJournals(
+            Authentication authentication,
+            @RequestParam String q,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        String userEmail = getUserEmail(authentication);
+        LOGGER.info("API HIT: Searching journals for user: {} with query: {}", userEmail, q);
+        Page<JournalRequestDTO> result = service.searchJournals(userEmail, q, page, size);
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Search results fetched successfully",
+                        result
+                )
+        );
+    }
+
     //Update journal
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PutMapping("/{journalId}")
@@ -160,6 +181,26 @@ public class JournalController {
                 new ApiResponse<>(
                         true,
                         "Journal updated successfully",
+                        result
+                )
+        );
+    }
+
+    //Toggle star/pinned status of journal entry
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PatchMapping("/{journalId}/star")
+    public ResponseEntity<ApiResponse<JournalRequestDTO>> toggleStarJournal(
+            @PathVariable Long journalId,
+            @RequestParam boolean starred,
+            Authentication authentication
+    ) {
+        String userEmail = getUserEmail(authentication);
+        LOGGER.info("API HIT: Toggling star status for journal ID: {} to {} for user: {}", journalId, starred, userEmail);
+        JournalRequestDTO result = service.toggleStarJournal(journalId, userEmail, starred);
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Journal star status updated successfully",
                         result
                 )
         );

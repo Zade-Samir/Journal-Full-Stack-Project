@@ -20,21 +20,24 @@ export function AppSettingsProvider({ children }) {
   useEffect(() => {
     localStorage.setItem('theme', theme);
     const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-      root.classList.remove('light');
-    } else {
-      root.classList.add('light');
-      root.classList.remove('dark');
+    root.classList.remove('dark', 'dim', 'light');
+    if (theme !== 'navy') {
+      root.classList.add(theme);
     }
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+    // Cycles: navy -> dark -> dim -> light -> navy
+    setTheme(prev => {
+      if (prev === 'navy') return 'dark';
+      if (prev === 'dark') return 'dim';
+      if (prev === 'dim') return 'light';
+      return 'navy';
+    });
   };
 
   return (
-    <AppSettingsContext.Provider value={{ isFullWidth, setIsFullWidth, theme, toggleTheme }}>
+    <AppSettingsContext.Provider value={{ isFullWidth, setIsFullWidth, theme, setTheme, toggleTheme }}>
       {children}
     </AppSettingsContext.Provider>
   );

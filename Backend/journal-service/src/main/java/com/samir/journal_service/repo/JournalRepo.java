@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Pageable;
 
 public interface JournalRepo extends JpaRepository<Journal, Long> {
 
@@ -48,6 +49,20 @@ public interface JournalRepo extends JpaRepository<Journal, Long> {
     List<Journal> findJournalsByGoalIdAndUserId(@Param("goalId") Long goalId, @Param("userId") String userId);
 
     List<Journal> findByUserIdAndDateBetweenAndIsDeletedFalseOrderByDateDesc(String userId, LocalDate startDate, LocalDate endDate);
+
+    @Query("SELECT j FROM Journal j " +
+           "WHERE j.userId = :userId AND j.isDeleted = false AND (" +
+           "LOWER(j.whatDidIDo) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
+           "LOWER(j.bestMoment) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
+           "LOWER(j.worstMoment) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
+           "LOWER(j.whatILearned) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
+           "LOWER(j.whatIDoForGoal) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
+           "LOWER(j.feelingNote) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
+           "LOWER(j.feeling) LIKE LOWER(CONCAT('%', :q, '%'))) " +
+           "ORDER BY j.date DESC")
+    Page<Journal> searchByUserIdAndKeyword(@Param("userId") String userId,
+                                           @Param("q") String keyword,
+                                           Pageable pageable);
 
     @org.springframework.data.jpa.repository.Modifying
     @org.springframework.transaction.annotation.Transactional

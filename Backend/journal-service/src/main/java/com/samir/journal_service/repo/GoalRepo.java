@@ -19,6 +19,8 @@ public interface GoalRepo extends JpaRepository<Goal, Long> {
 
     List<Goal> findByUserIdAndStatusAndUpdatedAtBetween(String userId, GoalStatus status, java.time.LocalDateTime start, java.time.LocalDateTime end);
 
+    List<Goal> findByStatusNotAndTargetDate(GoalStatus status, LocalDate targetDate);
+
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM journal_goal WHERE goal_id = :goalId", nativeQuery = true)

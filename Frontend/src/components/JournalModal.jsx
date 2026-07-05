@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Calendar, Cloud, MoreVertical, Edit2, Trash2, CheckCircle2, Loader2, AlertCircle, Plus } from 'lucide-react';
+import { X, Calendar, Cloud, MoreVertical, Edit2, Trash2, CheckCircle2, Loader2, AlertCircle, Plus, Star } from 'lucide-react';
 import { TextArea } from './TextArea';
 import { InputField } from './InputField';
 import { EmotionSelector } from './EmotionSelector';
@@ -133,6 +133,49 @@ export function JournalModal({ journal, onClose, onDelete, onUpdate, startInEdit
    if (!journal || !journal.fullData) return null;
  
    const id = journal.fullData.id || journal.id;
+   const isStarred = journal.fullData?.starred || false;
+ 
+   // Calculate word count & reading time
+   const gratitudeList = (journal.fullData?.gratitude || []).filter(g => g?.trim());
+   const shortGoalsList = (journal.fullData?.shortTermGoal || []).filter(g => g?.trim());
+   const longGoalsList  = (journal.fullData?.longTermGoal  || []).filter(g => g?.trim());
+ 
+   const texts = [
+     journal.fullData?.whatDidIDo,
+     journal.fullData?.bestMoment,
+     journal.fullData?.worstMoment,
+     journal.fullData?.whatILearned,
+     journal.fullData?.whatIDoForGoal,
+     journal.fullData?.feelingNote,
+     ...gratitudeList,
+     ...shortGoalsList,
+     ...longGoalsList
+   ];
+   const combinedText = texts.filter(t => typeof t === 'string' && t.trim()).join(' ');
+   const words = combinedText.trim().split(/\s+/).filter(w => w.length > 0);
+   const wordCount = words.length;
+   const readingTime = Math.max(1, Math.round(wordCount / 200));
+ 
+   const handleToggleStar = async () => {
+     try {
+       const token = localStorage.getItem('token');
+       const newStarred = !isStarred;
+       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/journal/${id}/star?starred=${newStarred}`, {
+         method: 'PATCH',
+         headers: {
+           'Authorization': `Bearer ${token}`
+         }
+       });
+       const json = await res.json();
+       if (res.ok && json.success) {
+         if (onUpdate) {
+           onUpdate({ ...journal.fullData, starred: newStarred });
+         }
+       }
+     } catch (err) {
+       console.error("Error toggling star in modal", err);
+     }
+   };
  
    const updateArray = (setter, array, index, value) => {
      const newArr = [...array];
@@ -252,7 +295,9 @@ export function JournalModal({ journal, onClose, onDelete, onUpdate, startInEdit
         {/* Sticky Header */}
         <div className="sticky top-0 bg-bg-base/90 backdrop-blur-xl border-b border-border/50 px-6 py-4 flex items-center justify-between z-50 shrink-0">
           <div>
-            <p className="text-brand text-xs font-bold tracking-widest uppercase mb-1">{journal.date}</p>
+            <p className="text-brand text-xs font-bold tracking-widest uppercase mb-1">
+              {journal.date} {!isEditing && <span className="text-text-tertiary font-normal text-[10px] ml-2">• {wordCount} words • ~{readingTime} min read</span>}
+            </p>
             <h2 className="text-lg font-semibold text-text-primary hidden md:block">
                {isEditing ? "Editing Journal Entry" : "Journal Entry Archive"}
             </h2>
@@ -272,6 +317,20 @@ export function JournalModal({ journal, onClose, onDelete, onUpdate, startInEdit
                  {!isEditing ? "Read Only" : saveStatus === 'saving' ? "Auto-saving..." : saveStatus === 'saved' ? "Edit Mode" : "Offline"}
               </span>
             </div>
+
+            {/* Star Toggle Button */}
+            {!isEditing && (
+              <button
+                onClick={handleToggleStar}
+                className={cn(
+                  "p-2 rounded-full transition-all border border-border/50 flex shrink-0 hover:bg-black/5 dark:hover:bg-white/5",
+                  isStarred ? "text-amber-400 bg-amber-400/5 border-amber-400/20" : "text-text-tertiary bg-input-bg hover:text-text-secondary"
+                )}
+                title={isStarred ? "Unstar Entry" : "Star Entry"}
+              >
+                <Star size={16} fill={isStarred ? "currentColor" : "none"} />
+              </button>
+            )}
             
             {/* 3-Dots Menu Map */}
             <div className="relative">

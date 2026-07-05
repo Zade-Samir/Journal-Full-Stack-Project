@@ -35,4 +35,5 @@ public class JournalRequestDTO {
     @NotBlank(message = "Feeling is required")
     private String feeling;
     private String feelingNote;
+    private boolean starred;
 }

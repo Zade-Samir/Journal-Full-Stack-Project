@@ -7,6 +7,9 @@ import { EmotionSelector } from '../components/EmotionSelector';
 import { Button } from '../components/Button';
 import { GoalCard } from '../components/GoalCard';
 import { HeaderActions } from '../components/HeaderActions';
+import { MoodSparkline } from '../components/MoodSparkline';
+import { ContributionHeatmap } from '../components/ContributionHeatmap';
+import { OnboardingWizard } from '../components/OnboardingWizard';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { cn } from '../utils/cn';
 
@@ -34,6 +37,10 @@ export function Home() {
   const [journalId, setJournalId] = useState(null);
   const [saveStatus, setSaveStatus] = useState('saved'); // 'saved', 'saving', 'error'
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [streak, setStreak] = useState(0);
+  const [dailyMoods, setDailyMoods] = useState([]);
+  const [onboardingCompleted, setOnboardingCompleted] = useState(() => localStorage.getItem('onboardingCompleted') === 'true');
+  const [showRecoveryPrompt, setShowRecoveryPrompt] = useState(false);
   const isInitialMount = useRef(true);
 
   const updateArray = (setter, array, index, value) => {
@@ -58,6 +65,21 @@ export function Home() {
   }).format(new Date());
 
   useEffect(() => {
+    const checkLocalDraft = () => {
+      try {
+        const savedDraft = localStorage.getItem('quiet_room_draft_today');
+        if (savedDraft) {
+          const parsed = JSON.parse(savedDraft);
+          const hasDraftContent = parsed.whatDidIDo?.trim() || parsed.bestMoment?.trim() || parsed.whatILearned?.trim();
+          if (hasDraftContent) {
+            setShowRecoveryPrompt(true);
+          }
+        }
+      } catch (e) {
+        console.error("Error reading local draft", e);
+      }
+    };
+
     const fetchToday = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -87,9 +109,12 @@ export function Home() {
           if (entry.whatIDoForGoal) setWhatIDoForGoal(entry.whatIDoForGoal);
           if (entry.feeling) setMood(entry.feeling);
           if (entry.feelingNote) setFeelingNote(entry.feelingNote);
+        } else {
+          checkLocalDraft();
         }
       } catch (err) {
         console.error("Could not fetch today's journal", err);
+        checkLocalDraft();
       } finally {
         setTimeout(() => setIsDataLoaded(true), 500); // 500ms grace period for state updates
       }
@@ -113,7 +138,91 @@ export function Home() {
     
     fetchToday();
     fetchActiveGoals();
+
+    // Fetch streak
+    const fetchStreak = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/journal/streak`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const json = await res.json();
+        if (res.ok && json.success) setStreak(json.data?.streak ?? 0);
+      } catch (e) { /* silent */ }
+    };
+    fetchStreak();
+
+    // Fetch last 365 days of mood data for the heatmap & sparkline
+    const fetchMoodStats = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/journal/stats?range=365d`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const json = await res.json();
+        if (res.ok && json.success && json.data?.dailyMoods) {
+          setDailyMoods(json.data.dailyMoods);
+        }
+      } catch (e) { /* silent */ }
+    };
+    fetchMoodStats();
   }, []);
+
+  // Save draft to localStorage as fallback
+  useEffect(() => {
+    if (!isDataLoaded) return;
+    const draft = {
+      whatDidIDo,
+      bestMoment,
+      worstMoment,
+      whatILearned,
+      gratitude,
+      shortTermGoal,
+      longTermGoal,
+      selectedGoalIds,
+      whatIDoForGoal,
+      feeling: mood,
+      feelingNote,
+      timestamp: Date.now()
+    };
+    const hasContent = whatDidIDo.trim() || bestMoment.trim() || worstMoment.trim() || whatILearned.trim() || whatIDoForGoal.trim();
+    if (hasContent) {
+      localStorage.setItem('quiet_room_draft_today', JSON.stringify(draft));
+    } else {
+      localStorage.removeItem('quiet_room_draft_today');
+    }
+  }, [whatDidIDo, bestMoment, worstMoment, whatILearned, gratitude, shortTermGoal, longTermGoal, selectedGoalIds, whatIDoForGoal, mood, feelingNote, isDataLoaded]);
+
+  const handleRestoreDraft = () => {
+    try {
+      const savedDraft = localStorage.getItem('quiet_room_draft_today');
+      if (savedDraft) {
+        const parsed = JSON.parse(savedDraft);
+        if (parsed.whatDidIDo) setWhatDidIDo(parsed.whatDidIDo);
+        if (parsed.bestMoment) setBestMoment(parsed.bestMoment);
+        if (parsed.worstMoment) setWorstMoment(parsed.worstMoment);
+        if (parsed.whatILearned) setWhatILearned(parsed.whatILearned);
+        if (parsed.gratitude) setGratitude(parsed.gratitude);
+        if (parsed.shortTermGoal) setShortTermGoal(parsed.shortTermGoal);
+        if (parsed.longTermGoal) setLongTermGoal(parsed.longTermGoal);
+        if (parsed.selectedGoalIds) setSelectedGoalIds(parsed.selectedGoalIds);
+        if (parsed.whatIDoForGoal) setWhatIDoForGoal(parsed.whatIDoForGoal);
+        if (parsed.feeling) setMood(parsed.feeling);
+        if (parsed.feelingNote) setFeelingNote(parsed.feelingNote);
+      }
+    } catch (e) {
+      console.error("Error restoring draft", e);
+    } finally {
+      setShowRecoveryPrompt(false);
+    }
+  };
+
+  const handleDiscardDraft = () => {
+    localStorage.removeItem('quiet_room_draft_today');
+    setShowRecoveryPrompt(false);
+  };
 
   // Debounced Auto-Save
   useEffect(() => {
@@ -240,6 +349,7 @@ export function Home() {
         throw new Error(data.message || "Failed to create journal entry.");
       }
 
+      localStorage.removeItem('quiet_room_draft_today');
       navigate('/complete');
     } catch (err) {
       setError(err.message || "Cannot connect to server. Check your connection.");
@@ -255,7 +365,7 @@ export function Home() {
       "mx-auto px-6 py-12 md:py-20", 
       isFullWidth ? "max-w-[120rem] md:px-16 lg:px-24" : "max-w-3xl"
     )}>
-      <header className="flex justify-between items-start mb-20">
+      <header className="flex justify-between items-start mb-8">
         <div>
           <p className="text-brand text-xs font-bold tracking-widest uppercase mb-2">{today}</p>
           <h2 className="text-lg font-semibold text-text-primary block md:hidden">The Quiet Room</h2>
@@ -276,6 +386,68 @@ export function Home() {
           <HeaderActions />
         </div>
       </header>
+
+      {/* Offline Draft Recovery Banner */}
+      {showRecoveryPrompt && (
+        <div className="mb-8 p-4 rounded-2xl bg-brand/10 border border-brand/20 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center gap-3">
+            <span className="text-xl">📝</span>
+            <div>
+              <p className="text-sm font-semibold text-text-primary">Unsaved draft recovered</p>
+              <p className="text-xs text-text-secondary mt-0.5">We found an unsaved draft from your last session. Would you like to restore it?</p>
+            </div>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <button 
+              onClick={handleDiscardDraft}
+              className="px-4 py-1.5 rounded-full border border-border/60 text-xs font-semibold text-text-secondary hover:bg-input-bg transition-colors"
+            >
+              Discard
+            </button>
+            <button 
+              onClick={handleRestoreDraft}
+              className="px-4 py-1.5 rounded-full bg-brand hover:bg-brand-hover text-white text-xs font-semibold transition-colors"
+            >
+              Restore Draft
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Streak + Mood Banner ──────────────────────────────────────── */}
+      {(() => {
+        const MOOD_EMOJI = { happy: '😊', neutral: '😐', sad: '😢', stressed: '⚡', motivated: '🚀' };
+        const MOOD_LABEL = { happy: 'Happy', neutral: 'Neutral', sad: 'Sad', stressed: 'Stressed', motivated: 'Motivated' };
+        const moodEmoji = MOOD_EMOJI[mood] || '😐';
+        const moodLabel = MOOD_LABEL[mood] || 'Neutral';
+        return (
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-12">
+            <div className="flex flex-wrap items-center gap-3">
+              {streak > 0 && (
+                <div className={cn(
+                  "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border",
+                  streak >= 7
+                    ? "bg-orange-500/10 border-orange-500/20 text-orange-400"
+                    : "bg-input-bg border-border text-text-secondary"
+                )}>
+                  <span className="text-base">🔥</span>
+                  {streak} day{streak !== 1 ? 's' : ''} streak
+                </div>
+              )}
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-input-bg border border-border text-text-secondary">
+                <span className="text-base">{moodEmoji}</span>
+                Today: {moodLabel}
+              </div>
+            </div>
+            {/* 7-day mood sparkline */}
+            {dailyMoods.length > 0 && (
+              <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-input-bg border border-border">
+                <MoodSparkline dailyMoods={dailyMoods} />
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       <div className="space-y-20 content-fade">
         
@@ -445,6 +617,10 @@ export function Home() {
           />
         </section>
 
+        <section className="pt-4">
+          <ContributionHeatmap dailyMoods={dailyMoods} />
+        </section>
+
         <div className="pt-12 pb-24 flex justify-center">
           <Button 
             size="lg" 
@@ -457,6 +633,29 @@ export function Home() {
           </Button>
         </div>
       </div>
+
+      {!onboardingCompleted && isDataLoaded && dailyMoods.length === 0 && activeGoalsList.length === 0 && (
+        <OnboardingWizard 
+          onComplete={() => {
+            setOnboardingCompleted(true);
+            // Refresh goals
+            const fetchActiveGoals = async () => {
+              try {
+                const token = localStorage.getItem("token");
+                if (!token) return;
+                const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/journal/goals`, {
+                  headers: { "Authorization": `Bearer ${token}` }
+                });
+                const json = await res.json();
+                if (res.ok && json.success) {
+                  setActiveGoalsList(json.data || []);
+                }
+              } catch (e) {}
+            };
+            fetchActiveGoals();
+          }}
+        />
+      )}
     </div>
   );
 }

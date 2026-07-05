@@ -14,6 +14,8 @@ public interface JournalService {
 
     Page<JournalRequestDTO> getAllJournal(String userEmail, String role, int page, int size);
 
+    Page<JournalRequestDTO> searchJournals(String userEmail, String keyword, int page, int size);
+
     JournalRequestDTO getTodayJournal(String userEmail);
 
     JournalRequestDTO updateJournal(Long journalId, String userEmail, JournalRequestDTO dto);
@@ -21,6 +23,8 @@ public interface JournalService {
     void deleteJournal(Long journalId, String userEmail, String role);
 
     JournalRequestDTO autoSaveJournal(String userEmail, JournalAutoSaveDTO dto);
+
+    JournalRequestDTO toggleStarJournal(Long journalId, String userEmail, boolean starred);
 
     int getJournalStreak(String userEmail);
 

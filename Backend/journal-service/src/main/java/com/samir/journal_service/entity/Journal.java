@@ -89,6 +89,9 @@ public class Journal {
 
     @Column(name = "is_deleted")
     private boolean isDeleted = false;
+
+    @Column(name = "starred", nullable = false)
+    private boolean starred = false;
 }
 
 
