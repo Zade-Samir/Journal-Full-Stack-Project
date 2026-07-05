@@ -30,9 +30,21 @@ public class JwtAuthenticationFilter implements GlobalFilter {
 
         LOGGER.info("Incoming request: {}", exchange.getRequest().getURI());
 
-        if(path.startsWith("/auth")) {
+        // Only bypass JWT for public auth endpoints — protected routes like /auth/account must go through the filter
+        boolean isPublicAuthPath =
+                path.equals("/auth/login") ||
+                path.equals("/auth/register") ||
+                path.equals("/auth/refresh") ||
+                path.equals("/auth/logout") ||
+                path.equals("/auth/verify") ||
+                path.startsWith("/auth/oauth2") ||
+                path.startsWith("/login/oauth2") ||
+                path.startsWith("/oauth2");
+
+        if (isPublicAuthPath) {
             return chain.filter(exchange);
         }
+
 
         String authHeader = exchange.getRequest()
                 .getHeaders()
