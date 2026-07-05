@@ -25,5 +25,11 @@ public class User {
 
     @Column(name = "token_expiry")
     private java.time.LocalDateTime tokenExpiry;
+
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
+    @Column(name = "refresh_token_expiry")
+    private java.time.LocalDateTime refreshTokenExpiry;
 }
 

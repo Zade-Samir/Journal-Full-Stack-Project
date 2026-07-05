@@ -49,6 +49,7 @@ services:
       - RESEND_API_KEY=${RESEND_API_KEY}
       - RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL}
       - EUREKA_URL=http://eureka-server:8761/eureka
+      - ZIPKIN_URL=http://zipkin-server:9411/api/v2/spans
     depends_on:
       mysql-db:
         condition: service_healthy
@@ -68,6 +69,7 @@ services:
       - DB_URL=jdbc:mysql://mysql-db:3306/journalDB?createDatabaseIfNotExist=true&serverTimezone=UTC
       - DB_PASSWORD=${DB_PASSWORD}
       - EUREKA_URL=http://eureka-server:8761/eureka
+      - ZIPKIN_URL=http://zipkin-server:9411/api/v2/spans
     depends_on:
       mysql-db:
         condition: service_healthy
@@ -87,11 +89,26 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - EUREKA_URL=http://eureka-server:8761/eureka
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost:5173}
+      - ZIPKIN_URL=http://zipkin-server:9411/api/v2/spans
     depends_on:
       eureka-server:
         condition: service_healthy
     networks:
       - journal-network
+
+  zipkin-server:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin-server
+    ports:
+      - "9411:9411"
+    networks:
+      - journal-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:9411/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 
 volumes:
   mysql-data:

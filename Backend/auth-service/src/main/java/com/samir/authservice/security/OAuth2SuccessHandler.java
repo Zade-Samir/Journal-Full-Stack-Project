@@ -1,6 +1,7 @@
 package com.samir.authservice.security;
 
 import com.samir.authservice.service.AuthService;
+import com.samir.authservice.dto.AuthResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,10 +40,20 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             String email = user.getAttribute("email");
             LOGGER.info("OAuth2 login SUCCESS for email: {}", email);
 
-            String token = authService.handleGoogleLogin(email);
+            AuthResponse result = authService.handleGoogleLogin(email);
             LOGGER.info("Token generated, redirecting to: {}/oauth-success", frontendUrl);
 
-            response.sendRedirect(frontendUrl + "/oauth-success?token=" + token);
+            // Write secure HttpOnly cookie for refresh token
+            org.springframework.http.ResponseCookie cookie = org.springframework.http.ResponseCookie.from("refresh_token", result.getRefreshToken())
+                    .httpOnly(true)
+                    .secure(false) // Set to false to support local testing over HTTP without SSL
+                    .path("/")
+                    .maxAge(7 * 24 * 60 * 60) // 7 days
+                    .sameSite("Lax")
+                    .build();
+            response.addHeader(org.springframework.http.HttpHeaders.SET_COOKIE, cookie.toString());
+
+            response.sendRedirect(frontendUrl + "/oauth-success?token=" + result.getToken());
         } catch (Exception e) {
             LOGGER.error("Error in OAuth2SuccessHandler: {}", e.getMessage(), e);
             response.sendRedirect(frontendUrl + "/login?error=server_error");

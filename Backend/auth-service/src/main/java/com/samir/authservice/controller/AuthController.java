@@ -10,7 +10,10 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/auth")
@@ -36,10 +39,25 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponse>> login(
-            @Valid @RequestBody AuthRequest request
+            @Valid @RequestBody AuthRequest request,
+            HttpServletResponse response
     ) {
         LOGGER.info("API HIT: Login endpoint called");
         AuthResponse result = service.login(request);
+
+        // Write secure HttpOnly cookie for refresh token
+        ResponseCookie cookie = ResponseCookie.from("refresh_token", result.getRefreshToken())
+                .httpOnly(true)
+                .secure(false) // Set to false to support local testing over HTTP without SSL
+                .path("/")
+                .maxAge(7 * 24 * 60 * 60) // 7 days
+                .sameSite("Lax")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        // Do not return refresh token in body
+        result.setRefreshToken(null);
+
         return ResponseEntity.ok(
                 new ApiResponse<>(
                         true,
@@ -72,6 +90,52 @@ public class AuthController {
                 new ApiResponse<>(
                         true,
                         "New verification code sent successfully!",
+                        null)
+        );
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<AuthResponse>> refresh(
+            @CookieValue(value = "refresh_token", required = false) String refreshToken
+    ) {
+        LOGGER.info("API HIT: Refresh endpoint called");
+        if (refreshToken == null) {
+            throw new RuntimeException("Missing refresh token.");
+        }
+        AuthResponse result = service.refreshAccessToken(refreshToken);
+        result.setRefreshToken(null);
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Token refreshed successfully!",
+                        result)
+        );
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<String>> logout(
+            @CookieValue(value = "refresh_token", required = false) String refreshToken,
+            HttpServletResponse response
+    ) {
+        LOGGER.info("API HIT: Logout endpoint called");
+        if (refreshToken != null) {
+            service.logout(refreshToken);
+        }
+
+        // Clear refresh_token cookie
+        ResponseCookie cookie = ResponseCookie.from("refresh_token", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0) // immediately delete
+                .sameSite("Lax")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Logged out successfully!",
                         null)
         );
     }

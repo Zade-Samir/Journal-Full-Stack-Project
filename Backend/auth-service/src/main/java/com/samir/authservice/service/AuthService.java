@@ -8,9 +8,13 @@ public interface AuthService {
 
     void register(AuthRequest request);
 
-    String handleGoogleLogin(String email);
+    AuthResponse handleGoogleLogin(String email);
 
     void verifyOtp(String email, String code);
 
     void resendOtp(String email);
+
+    AuthResponse refreshAccessToken(String refreshToken);
+
+    void logout(String refreshToken);
 }

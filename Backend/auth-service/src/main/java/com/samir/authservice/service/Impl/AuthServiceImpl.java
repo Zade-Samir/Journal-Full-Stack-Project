@@ -55,9 +55,14 @@ public class AuthServiceImpl implements AuthService {
                 user.getRole()
         );
 
+        String refreshToken = java.util.UUID.randomUUID().toString();
+        user.setRefreshToken(refreshToken);
+        user.setRefreshTokenExpiry(LocalDateTime.now().plusDays(7));
+        repo.save(user);
+
         LOGGER.info("Login successful for email: {}", request.getEmail());
 
-        return new AuthResponse(token);
+        return new AuthResponse(token, refreshToken);
     }
 
 
@@ -110,7 +115,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String handleGoogleLogin(String email) {
+    public AuthResponse handleGoogleLogin(String email) {
 
         User user = repo.findByEmail(email)
                 .map(existingUser -> {
@@ -131,7 +136,13 @@ public class AuthServiceImpl implements AuthService {
                     return repo.save(newUser);
                 });
 
-        return jwtUtil.generateToken(user.getEmail(), user.getRole());
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+        String refreshToken = java.util.UUID.randomUUID().toString();
+        user.setRefreshToken(refreshToken);
+        user.setRefreshTokenExpiry(LocalDateTime.now().plusDays(7));
+        repo.save(user);
+
+        return new AuthResponse(token, refreshToken);
     }
 
     @Override
@@ -187,6 +198,38 @@ public class AuthServiceImpl implements AuthService {
 
         LOGGER.info("New verification OTP generated for resend: {}", email);
         emailService.sendVerificationEmail(user.getEmail(), otp);
+    }
+
+    @Override
+    public AuthResponse refreshAccessToken(String refreshToken) {
+        LOGGER.info("Attempting to refresh access token using refresh token");
+        User user = repo.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> {
+                    LOGGER.warn("Invalid refresh token");
+                    return new RuntimeException("Invalid refresh token.");
+                });
+
+        if (user.getRefreshTokenExpiry().isBefore(LocalDateTime.now())) {
+            LOGGER.warn("Expired refresh token for user: {}", user.getEmail());
+            throw new RuntimeException("Refresh token has expired. Please log in again.");
+        }
+
+        // Generate a new access token
+        String newAccessToken = jwtUtil.generateToken(user.getEmail(), user.getRole());
+        LOGGER.info("Successfully refreshed access token for user: {}", user.getEmail());
+
+        return new AuthResponse(newAccessToken, refreshToken);
+    }
+
+    @Override
+    public void logout(String refreshToken) {
+        LOGGER.info("Logging out and revoking refresh token");
+        repo.findByRefreshToken(refreshToken).ifPresent(user -> {
+            user.setRefreshToken(null);
+            user.setRefreshTokenExpiry(null);
+            repo.save(user);
+            LOGGER.info("Successfully revoked refresh token for user: {}", user.getEmail());
+        });
     }
 }
 
