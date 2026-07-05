@@ -13,14 +13,24 @@ export function HeaderActions({ className }) {
   const navigate = useNavigate();
 
   let userEmail = "Journal Keeper";
+  let firstName = "";
+  let lastName = "";
+  let avatarUrl = "";
+
   try {
     const token = localStorage.getItem("token");
     if (token) {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const payload = JSON.parse(window.atob(base64));
       userEmail = payload.sub || payload.email || "Journal Keeper";
+      firstName = payload.firstName || "";
+      lastName = payload.lastName || "";
+      avatarUrl = payload.avatarUrl || "";
     }
   } catch(e) {}
 
+  const displayName = firstName || lastName ? `${firstName} ${lastName}`.trim() : userEmail.split('@')[0];
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -34,6 +44,67 @@ export function HeaderActions({ className }) {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const handleExportData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/journal/export`, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data.data, null, 2))}`;
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", jsonString);
+        downloadAnchor.setAttribute("download", "my_journal_export.json");
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+      } else {
+        alert("Export failed: " + (data.message || "Server error"));
+      }
+    } catch (e) {
+      alert("Error exporting data: " + e.message);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    const confirmText = prompt("WARNING: This will permanently delete your account and all your journal entries. This action CANNOT be undone.\n\nType 'DELETE' to confirm:");
+    if (confirmText !== "DELETE") {
+      alert("Account deletion canceled.");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const responseJournal = await fetch(`${import.meta.env.VITE_API_BASE_URL}/journal/account`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      const responseAuth = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/account`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      if (responseJournal.ok && responseAuth.ok) {
+        alert("Your account and all associated data have been permanently deleted.");
+        localStorage.removeItem("token");
+        navigate("/login");
+      } else {
+        alert("Account deletion failed. Some services might be unavailable.");
+      }
+    } catch (e) {
+      alert("Error deleting account: " + e.message);
+    }
+  };
+
   return (
     <div className={cn("flex items-center gap-3 relative", className)}>
       <div className="relative" ref={profileRef}>
@@ -42,7 +113,13 @@ export function HeaderActions({ className }) {
           className="h-8 w-8 bg-text-primary rounded-full flex items-center justify-center shrink-0 overflow-hidden shadow-sm hover:opacity-90 transition-opacity"
           title="Account"
         >
-          <User size={16} className="text-bg-base" strokeWidth={2.5} />
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="Avatar" className="h-full w-full object-cover" />
+          ) : (
+            <span className="text-[11px] font-bold text-bg-base">
+              {displayName.charAt(0).toUpperCase()}
+            </span>
+          )}
         </button>
 
         {isProfileOpen && (
@@ -50,16 +127,40 @@ export function HeaderActions({ className }) {
             
             <div className="p-4 border-b border-border/50 bg-black/5 dark:bg-white/5">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-brand/10 text-brand flex items-center justify-center shrink-0 border border-brand/20">
-                  <User size={20} />
+                <div className="h-10 w-10 rounded-full bg-brand/10 text-brand flex items-center justify-center shrink-0 border border-brand/20 overflow-hidden">
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="Avatar" className="h-full w-full object-cover" />
+                  ) : (
+                    <span className="text-sm font-bold text-brand">
+                      {displayName.charAt(0).toUpperCase()}
+                    </span>
+                  )}
                 </div>
                 <div className="overflow-hidden">
-                  <p className="text-sm font-semibold text-text-primary truncate" title={userEmail}>
-                    {userEmail.split('@')[0]}
+                  <p className="text-sm font-semibold text-text-primary truncate" title={displayName}>
+                    {displayName}
                   </p>
                   <p className="text-xs text-text-tertiary truncate">{userEmail}</p>
                 </div>
               </div>
+            </div>
+
+            <div className="p-2 border-b border-border/50 space-y-1">
+              <button 
+                onClick={handleExportData}
+                className="w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold text-text-secondary hover:bg-input-bg rounded-xl transition-colors text-left"
+              >
+                <span className="p-1 rounded bg-text-tertiary/10 text-text-secondary">📁</span>
+                Export My Data
+              </button>
+              
+              <button 
+                onClick={handleDeleteAccount}
+                className="w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold text-text-secondary hover:bg-input-bg rounded-xl transition-colors text-left"
+              >
+                <span className="p-1 rounded bg-red-500/10 text-red-500">⚠️</span>
+                Delete My Account
+              </button>
             </div>
 
             <div className="p-2">

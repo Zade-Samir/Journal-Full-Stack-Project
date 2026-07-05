@@ -435,6 +435,39 @@ public class JournalServiceImpl implements JournalService {
                 activeGoalDTOs
         );
     }
+
+    @Override
+    public List<JournalRequestDTO> exportUserData(String userEmail) {
+        LOGGER.info("Exporting all journal data for user: {}", userEmail);
+        Page<Journal> page = repo.findByUserIdAndIsDeletedFalse(userEmail, PageRequest.of(0, Integer.MAX_VALUE));
+        return page.getContent().stream()
+                .map(mapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    @org.springframework.cache.annotation.Caching(evict = {
+        @org.springframework.cache.annotation.CacheEvict(value = "todayJournals", key = "#userEmail"),
+        @org.springframework.cache.annotation.CacheEvict(value = "journalStreaks", key = "#userEmail"),
+        @org.springframework.cache.annotation.CacheEvict(value = "journalStats", allEntries = true),
+        @org.springframework.cache.annotation.CacheEvict(value = "journalArchives", allEntries = true),
+        @org.springframework.cache.annotation.CacheEvict(value = "reflectionSummaries", allEntries = true)
+    })
+    public void purgeUserData(String userEmail) {
+        LOGGER.info("Purging all data in journal-service for user: {}", userEmail);
+
+        repo.deleteJournalGoalLinksByUserId(userEmail);
+        repo.deleteJournalGratitudeByUserId(userEmail);
+        repo.deleteJournalShortTermGoalsByUserId(userEmail);
+        repo.deleteJournalLongTermGoalsByUserId(userEmail);
+        repo.deleteJournalsByUserId(userEmail);
+
+        goalRepo.deleteJournalGoalLinksByGoalUserId(userEmail);
+        goalRepo.deleteGoalsByUserId(userEmail);
+
+        LOGGER.info("Successfully purged all journal-service data for user: {}", userEmail);
+    }
 }
 
 

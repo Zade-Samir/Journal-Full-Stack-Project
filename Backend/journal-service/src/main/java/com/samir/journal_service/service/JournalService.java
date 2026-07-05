@@ -25,4 +25,8 @@ public interface JournalService {
     int getJournalStreak(String userEmail);
 
     com.samir.journal_service.Dto.ReflectionSummaryDTO getReflectionSummary(String userEmail, String range, String startDate, String endDate);
+
+    List<JournalRequestDTO> exportUserData(String userEmail);
+
+    void purgeUserData(String userEmail);
 }

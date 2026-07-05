@@ -139,4 +139,30 @@ public class AuthController {
                         null)
         );
     }
+
+    @DeleteMapping("/account")
+    public ResponseEntity<ApiResponse<String>> deleteAccount(
+            @RequestHeader(value = "X-User-Email", required = false) String userEmail,
+            HttpServletResponse response
+    ) {
+        LOGGER.info("API HIT: Delete account called for user: {}", userEmail);
+        if (userEmail == null) {
+            throw new RuntimeException("Missing user context");
+        }
+        service.deleteAccount(userEmail);
+
+        // Clear refresh_token cookie too
+        ResponseCookie cookie = ResponseCookie.from("refresh_token", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Lax")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "Account deleted successfully", null)
+        );
+    }
 }

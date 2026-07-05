@@ -31,5 +31,14 @@ public class User {
 
     @Column(name = "refresh_token_expiry")
     private java.time.LocalDateTime refreshTokenExpiry;
+
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 }
 

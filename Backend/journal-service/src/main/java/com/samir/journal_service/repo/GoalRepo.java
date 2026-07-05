@@ -23,4 +23,14 @@ public interface GoalRepo extends JpaRepository<Goal, Long> {
     @Transactional
     @Query(value = "DELETE FROM journal_goal WHERE goal_id = :goalId", nativeQuery = true)
     void deleteJournalLinksByGoalId(@Param("goalId") Long goalId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM journal_goal WHERE goal_id IN (SELECT id FROM goals WHERE user_id = :userId)", nativeQuery = true)
+    void deleteJournalGoalLinksByGoalUserId(@Param("userId") String userId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM goals WHERE user_id = :userId", nativeQuery = true)
+    void deleteGoalsByUserId(@Param("userId") String userId);
 }

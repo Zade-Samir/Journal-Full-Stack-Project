@@ -56,7 +56,7 @@ class AuthServiceImplTest {
 
         when(repo.findByEmail(request.getEmail())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(request.getPassword(), user.getPassword())).thenReturn(true);
-        when(jwtUtil.generateToken(user.getEmail(), user.getRole())).thenReturn("jwt_token");
+        when(jwtUtil.generateToken(user.getEmail(), user.getRole(), null, null, null)).thenReturn("jwt_token");
 
         AuthResponse response = service.login(request);
 
@@ -136,9 +136,9 @@ class AuthServiceImplTest {
         user.setVerified(true);
 
         when(repo.findByEmail(email)).thenReturn(Optional.of(user));
-        when(jwtUtil.generateToken(email, "USER")).thenReturn("google_jwt_token");
+        when(jwtUtil.generateToken(email, "USER", "John", "Doe", "avatar_url")).thenReturn("google_jwt_token");
 
-        AuthResponse result = service.handleGoogleLogin(email);
+        AuthResponse result = service.handleGoogleLogin(email, "John", "Doe", "avatar_url");
 
         assertEquals("google_jwt_token", result.getToken());
         assertNotNull(result.getRefreshToken());
@@ -151,12 +151,15 @@ class AuthServiceImplTest {
         User savedUser = new User();
         savedUser.setEmail(email);
         savedUser.setRole("USER");
+        savedUser.setFirstName("John");
+        savedUser.setLastName("Doe");
+        savedUser.setAvatarUrl("avatar_url");
 
         when(repo.findByEmail(email)).thenReturn(Optional.empty());
         when(repo.save(any(User.class))).thenReturn(savedUser);
-        when(jwtUtil.generateToken(email, "USER")).thenReturn("new_google_jwt_token");
+        when(jwtUtil.generateToken(email, "USER", "John", "Doe", "avatar_url")).thenReturn("new_google_jwt_token");
 
-        AuthResponse result = service.handleGoogleLogin(email);
+        AuthResponse result = service.handleGoogleLogin(email, "John", "Doe", "avatar_url");
 
         assertEquals("new_google_jwt_token", result.getToken());
         assertNotNull(result.getRefreshToken());

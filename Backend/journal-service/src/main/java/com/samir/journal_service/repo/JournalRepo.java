@@ -48,4 +48,29 @@ public interface JournalRepo extends JpaRepository<Journal, Long> {
     List<Journal> findJournalsByGoalIdAndUserId(@Param("goalId") Long goalId, @Param("userId") String userId);
 
     List<Journal> findByUserIdAndDateBetweenAndIsDeletedFalseOrderByDateDesc(String userId, LocalDate startDate, LocalDate endDate);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.transaction.annotation.Transactional
+    @Query(value = "DELETE FROM journal_goal WHERE journal_id IN (SELECT id FROM journal WHERE user_id = :userId)", nativeQuery = true)
+    void deleteJournalGoalLinksByUserId(@Param("userId") String userId);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.transaction.annotation.Transactional
+    @Query(value = "DELETE FROM journal_gratitude WHERE journal_id IN (SELECT id FROM journal WHERE user_id = :userId)", nativeQuery = true)
+    void deleteJournalGratitudeByUserId(@Param("userId") String userId);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.transaction.annotation.Transactional
+    @Query(value = "DELETE FROM journal_short_term_goal WHERE journal_id IN (SELECT id FROM journal WHERE user_id = :userId)", nativeQuery = true)
+    void deleteJournalShortTermGoalsByUserId(@Param("userId") String userId);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.transaction.annotation.Transactional
+    @Query(value = "DELETE FROM journal_long_term_goal WHERE journal_id IN (SELECT id FROM journal WHERE user_id = :userId)", nativeQuery = true)
+    void deleteJournalLongTermGoalsByUserId(@Param("userId") String userId);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.transaction.annotation.Transactional
+    @Query(value = "DELETE FROM journal WHERE user_id = :userId", nativeQuery = true)
+    void deleteJournalsByUserId(@Param("userId") String userId);
 }

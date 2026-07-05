@@ -36,11 +36,15 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         try {
             OAuth2User user = (OAuth2User) authentication.getPrincipal();
 
-            //extract email
+            //extract fields
             String email = user.getAttribute("email");
-            LOGGER.info("OAuth2 login SUCCESS for email: {}", email);
+            String firstName = user.getAttribute("given_name");
+            String lastName = user.getAttribute("family_name");
+            String avatarUrl = user.getAttribute("picture");
 
-            AuthResponse result = authService.handleGoogleLogin(email);
+            LOGGER.info("OAuth2 login SUCCESS for email: {}, name: {}", email, firstName + " " + lastName);
+
+            AuthResponse result = authService.handleGoogleLogin(email, firstName, lastName, avatarUrl);
             LOGGER.info("Token generated, redirecting to: {}/oauth-success", frontendUrl);
 
             // Write secure HttpOnly cookie for refresh token

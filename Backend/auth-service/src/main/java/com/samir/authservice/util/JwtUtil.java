@@ -25,11 +25,18 @@ public class JwtUtil {
     }
 
     public String generateToken(String email, String role) {
+        return generateToken(email, role, null, null, null);
+    }
+
+    public String generateToken(String email, String role, String firstName, String lastName, String avatarUrl) {
 
         return Jwts
                 .builder()
                 .setSubject(email)
                 .claim("role", role)
+                .claim("firstName", firstName != null ? firstName : "")
+                .claim("lastName", lastName != null ? lastName : "")
+                .claim("avatarUrl", avatarUrl != null ? avatarUrl : "")
                 .setIssuedAt(new Date())
                 .setExpiration(
                         new Date(System.currentTimeMillis() + 1000 * 60 * 15) // 15 minutes

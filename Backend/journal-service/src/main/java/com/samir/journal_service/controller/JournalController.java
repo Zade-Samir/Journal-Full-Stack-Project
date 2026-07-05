@@ -228,4 +228,32 @@ public class JournalController {
         );
     }
 
+    // Export all active journals of the user
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @GetMapping("/export")
+    public ResponseEntity<ApiResponse<java.util.List<JournalRequestDTO>>> exportUserData(
+            Authentication authentication
+    ) {
+        String userEmail = getUserEmail(authentication);
+        LOGGER.info("API HIT: Exporting data for user: {}", userEmail);
+        java.util.List<JournalRequestDTO> result = service.exportUserData(userEmail);
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "Data exported successfully", result)
+        );
+    }
+
+    // Purge all journals and goals of the user
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @DeleteMapping("/account")
+    public ResponseEntity<ApiResponse<String>> purgeUserData(
+            Authentication authentication
+    ) {
+        String userEmail = getUserEmail(authentication);
+        LOGGER.info("API HIT: Purging data for user: {}", userEmail);
+        service.purgeUserData(userEmail);
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "User journal data purged successfully", null)
+        );
+    }
+
 }

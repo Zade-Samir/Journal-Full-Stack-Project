@@ -52,7 +52,10 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtUtil.generateToken(
                 user.getEmail(),
-                user.getRole()
+                user.getRole(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getAvatarUrl()
         );
 
         String refreshToken = java.util.UUID.randomUUID().toString();
@@ -86,6 +89,8 @@ public class AuthServiceImpl implements AuthService {
             
             // If they changed their password, let's update it too
             existingUser.setPassword(passwordEncoder.encode(request.getPassword()));
+            existingUser.setFirstName(request.getFirstName());
+            existingUser.setLastName(request.getLastName());
             
             repo.save(existingUser);
             LOGGER.info("Unverified user registered again, updated and generated new verification OTP for: {}", request.getEmail());
@@ -97,6 +102,8 @@ public class AuthServiceImpl implements AuthService {
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
 
         //make a user as default while register
         user.setRole("USER");
@@ -115,7 +122,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthResponse handleGoogleLogin(String email) {
+    public AuthResponse handleGoogleLogin(String email, String firstName, String lastName, String avatarUrl) {
 
         User user = repo.findByEmail(email)
                 .map(existingUser -> {
@@ -123,9 +130,11 @@ public class AuthServiceImpl implements AuthService {
                         existingUser.setVerified(true);
                         existingUser.setVerificationToken(null);
                         existingUser.setTokenExpiry(null);
-                        return repo.save(existingUser);
                     }
-                    return existingUser;
+                    existingUser.setFirstName(firstName);
+                    existingUser.setLastName(lastName);
+                    existingUser.setAvatarUrl(avatarUrl);
+                    return repo.save(existingUser);
                 })
                 .orElseGet(() -> {
                     User newUser = new User();
@@ -133,10 +142,13 @@ public class AuthServiceImpl implements AuthService {
                     newUser.setPassword(""); // not needed
                     newUser.setRole("USER");
                     newUser.setVerified(true);
+                    newUser.setFirstName(firstName);
+                    newUser.setLastName(lastName);
+                    newUser.setAvatarUrl(avatarUrl);
                     return repo.save(newUser);
                 });
 
-        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole(), user.getFirstName(), user.getLastName(), user.getAvatarUrl());
         String refreshToken = java.util.UUID.randomUUID().toString();
         user.setRefreshToken(refreshToken);
         user.setRefreshTokenExpiry(LocalDateTime.now().plusDays(7));
@@ -215,7 +227,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // Generate a new access token
-        String newAccessToken = jwtUtil.generateToken(user.getEmail(), user.getRole());
+        String newAccessToken = jwtUtil.generateToken(user.getEmail(), user.getRole(), user.getFirstName(), user.getLastName(), user.getAvatarUrl());
         LOGGER.info("Successfully refreshed access token for user: {}", user.getEmail());
 
         return new AuthResponse(newAccessToken, refreshToken);
@@ -230,6 +242,15 @@ public class AuthServiceImpl implements AuthService {
             repo.save(user);
             LOGGER.info("Successfully revoked refresh token for user: {}", user.getEmail());
         });
+    }
+
+    @Override
+    public void deleteAccount(String email) {
+        LOGGER.info("Purging user profile for: {}", email);
+        User user = repo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        repo.delete(user);
+        LOGGER.info("Successfully deleted user profile for: {}", email);
     }
 }
 

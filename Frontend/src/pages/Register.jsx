@@ -11,13 +11,15 @@ export const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    if (!email || !password || !confirmPassword) {
+    if (!email || !password || !confirmPassword || !firstName || !lastName) {
       setError("All fields are required.");
       return;
     }
@@ -35,7 +37,7 @@ export const Register = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, firstName, lastName }),
       });
 
       const data = await response.json().catch(() => ({}));
@@ -90,6 +92,23 @@ export const Register = () => {
           )}
 
           <form className="space-y-4" onSubmit={handleRegister}>
+            <div className="flex gap-4">
+              <input 
+                type="text" 
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="First Name" 
+                className="w-1/2 px-5 py-3.5 rounded-full border border-border bg-input-bg text-sm focus:outline-none focus:ring-2 focus:ring-border focus:border-transparent transition-all placeholder:text-text-tertiary"
+              />
+              <input 
+                type="text" 
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Last Name" 
+                className="w-1/2 px-5 py-3.5 rounded-full border border-border bg-input-bg text-sm focus:outline-none focus:ring-2 focus:ring-border focus:border-transparent transition-all placeholder:text-text-tertiary"
+              />
+            </div>
+
             <div>
               <input 
                 type="email" 
