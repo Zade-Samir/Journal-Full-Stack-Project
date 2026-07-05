@@ -277,7 +277,7 @@ export function Home() {
         </div>
       </header>
 
-      <div className="space-y-20">
+      <div className="space-y-20 animate-in fade-in duration-700">
         
         {error && (
             <div className="p-3 mb-8 rounded-xl bg-red-500/10 border border-red-500/20 flex gap-3 items-center text-red-500 text-sm">
