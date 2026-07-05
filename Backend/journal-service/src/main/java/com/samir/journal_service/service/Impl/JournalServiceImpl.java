@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,6 +38,7 @@ public class JournalServiceImpl implements JournalService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalServiceImpl.class);
 
     @Override
+    @Cacheable(value = "journalStats", key = "#userEmail + '_' + #range")
     public JournalStatsDTO getJournalStats(String userEmail, String range) {
         LOGGER.info("Fetching journal stats for user: {} with range: {}", userEmail, range);
         
@@ -62,7 +64,13 @@ public class JournalServiceImpl implements JournalService {
 
     //create the journal
     @Override
-    @CacheEvict(value = "todayJournals", key = "#userEmail")
+    @Caching(evict = {
+        @CacheEvict(value = "todayJournals", key = "#userEmail"),
+        @CacheEvict(value = "journalStreaks", key = "#userEmail"),
+        @CacheEvict(value = "journalStats", allEntries = true),
+        @CacheEvict(value = "journalArchives", allEntries = true),
+        @CacheEvict(value = "reflectionSummaries", allEntries = true)
+    })
     public JournalRequestDTO createJournal(String userEmail, JournalRequestDTO dto) {
 
         LOGGER.info("Creating journal for user: {}", userEmail);
@@ -110,7 +118,13 @@ public class JournalServiceImpl implements JournalService {
 
     //update the journal
     @Override
-    @CacheEvict(value = "todayJournals", key = "#userEmail")
+    @Caching(evict = {
+        @CacheEvict(value = "todayJournals", key = "#userEmail"),
+        @CacheEvict(value = "journalStreaks", key = "#userEmail"),
+        @CacheEvict(value = "journalStats", allEntries = true),
+        @CacheEvict(value = "journalArchives", allEntries = true),
+        @CacheEvict(value = "reflectionSummaries", allEntries = true)
+    })
     public JournalRequestDTO updateJournal(Long journalId, String userEmail, JournalRequestDTO dto) {
 
         LOGGER.info("Updating journal ID: {} for user: {}", journalId, userEmail);
@@ -163,6 +177,13 @@ public class JournalServiceImpl implements JournalService {
 
     //delete journal
     @Override
+    @Caching(evict = {
+        @CacheEvict(value = "todayJournals", key = "#userEmail"),
+        @CacheEvict(value = "journalStreaks", key = "#userEmail"),
+        @CacheEvict(value = "journalStats", allEntries = true),
+        @CacheEvict(value = "journalArchives", allEntries = true),
+        @CacheEvict(value = "reflectionSummaries", allEntries = true)
+    })
     public void deleteJournal(Long journalId, String userEmail, String role) {
 
         LOGGER.info("Delete request for journalId: {} by user: {} with role: {}",
@@ -194,7 +215,13 @@ public class JournalServiceImpl implements JournalService {
 
     //auto saving the journal
     @Override
-    @CacheEvict(value = "todayJournals", key = "#userEmail")
+    @Caching(evict = {
+        @CacheEvict(value = "todayJournals", key = "#userEmail"),
+        @CacheEvict(value = "journalStreaks", key = "#userEmail"),
+        @CacheEvict(value = "journalStats", allEntries = true),
+        @CacheEvict(value = "journalArchives", allEntries = true),
+        @CacheEvict(value = "reflectionSummaries", allEntries = true)
+    })
     public JournalRequestDTO autoSaveJournal(String userEmail, JournalAutoSaveDTO dto) {
 
         LOGGER.info("Auto-saving journal for user: {}", userEmail);
@@ -271,6 +298,7 @@ public class JournalServiceImpl implements JournalService {
 
     //get all journals
     @Override
+    @Cacheable(value = "journalArchives", key = "#userEmail + '_' + #page + '_' + #size")
     public Page<JournalRequestDTO> getAllJournal(String userEmail, String role, int page, int size) {
 
         LOGGER.info("Fetching journals for user: {} with role: {}", userEmail, role);
@@ -297,6 +325,7 @@ public class JournalServiceImpl implements JournalService {
     }
 
     @Override
+    @Cacheable(value = "journalStreaks", key = "#userEmail")
     public int getJournalStreak(String userEmail) {
         LOGGER.info("Calculating journal streak for user: {}", userEmail);
         List<LocalDate> dates = repo.findDatesByUserIdAndIsDeletedFalse(userEmail);
@@ -331,6 +360,7 @@ public class JournalServiceImpl implements JournalService {
     }
 
     @Override
+    @Cacheable(value = "reflectionSummaries", key = "#userEmail + '_' + #range + '_' + #startDateStr + '_' + #endDateStr")
     public ReflectionSummaryDTO getReflectionSummary(String userEmail, String range, String startDateStr, String endDateStr) {
         LOGGER.info("Fetching reflection summary for user: {} with range: {}, startDate: {}, endDate: {}", userEmail, range, startDateStr, endDateStr);
 
