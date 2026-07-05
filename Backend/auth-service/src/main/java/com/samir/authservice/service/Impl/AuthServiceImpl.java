@@ -66,9 +66,27 @@ public class AuthServiceImpl implements AuthService {
         LOGGER.info("Registering new user: {}", request.getEmail());
 
         //check user is already present or not -> Duplicate account creation blocked
-        if (repo.findByEmail(request.getEmail()).isPresent()) {
-            LOGGER.warn("Duplicate registration attempt: {}", request.getEmail());
-            throw new RuntimeException("User already exists!");
+        java.util.Optional<User> existingUserOpt = repo.findByEmail(request.getEmail());
+        if (existingUserOpt.isPresent()) {
+            User existingUser = existingUserOpt.get();
+            if (existingUser.isVerified()) {
+                LOGGER.warn("Duplicate registration attempt for verified user: {}", request.getEmail());
+                throw new RuntimeException("User already exists!");
+            }
+            
+            // Re-generate OTP code for unverified user (allows requesting resend/re-register)
+            String otp = String.valueOf(100000 + new java.util.Random().nextInt(900000));
+            existingUser.setVerificationToken(otp);
+            existingUser.setTokenExpiry(LocalDateTime.now().plusMinutes(10));
+            
+            // If they changed their password, let's update it too
+            existingUser.setPassword(passwordEncoder.encode(request.getPassword()));
+            
+            repo.save(existingUser);
+            LOGGER.info("Unverified user registered again, updated and generated new verification OTP for: {}", request.getEmail());
+            
+            emailService.sendVerificationEmail(existingUser.getEmail(), otp);
+            return;
         }
 
         User user = new User();
@@ -78,17 +96,17 @@ public class AuthServiceImpl implements AuthService {
         //make a user as default while register
         user.setRole("USER");
         
-        // Generate email verification token
-        String token = UUID.randomUUID().toString();
-        user.setVerificationToken(token);
-        user.setTokenExpiry(LocalDateTime.now().plusHours(24));
+        // Generate 6-digit email verification OTP
+        String otp = String.valueOf(100000 + new java.util.Random().nextInt(900000));
+        user.setVerificationToken(otp);
+        user.setTokenExpiry(LocalDateTime.now().plusMinutes(10));
         user.setVerified(false);
 
         repo.save(user);
-        LOGGER.info("User registered successfully, verification token generated for: {}", request.getEmail());
+        LOGGER.info("User registered successfully, verification OTP generated for: {}", request.getEmail());
 
         // Send verification email
-        emailService.sendVerificationEmail(user.getEmail(), token);
+        emailService.sendVerificationEmail(user.getEmail(), otp);
     }
 
     @Override
@@ -117,24 +135,58 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void verifyEmail(String token) {
-        LOGGER.info("Verifying email for token: {}", token);
-        User user = repo.findByVerificationToken(token)
+    public void verifyOtp(String email, String code) {
+        LOGGER.info("Verifying OTP code for email: {}", email);
+        User user = repo.findByEmail(email)
                 .orElseThrow(() -> {
-                    LOGGER.warn("Invalid verification token: {}", token);
-                    return new RuntimeException("Invalid verification token.");
+                    LOGGER.warn("User not found with email during OTP verification: {}", email);
+                    return new RuntimeException("User not found.");
                 });
 
+        if (user.isVerified()) {
+            LOGGER.warn("User email already verified: {}", email);
+            return;
+        }
+
+        if (user.getVerificationToken() == null || !user.getVerificationToken().equals(code)) {
+            LOGGER.warn("Invalid verification OTP code for email: {}", email);
+            throw new RuntimeException("Invalid verification code.");
+        }
+
         if (user.getTokenExpiry().isBefore(LocalDateTime.now())) {
-            LOGGER.warn("Expired verification token for email: {}", user.getEmail());
-            throw new RuntimeException("Verification token has expired. Please register again.");
+            LOGGER.warn("Expired verification OTP code for email: {}", email);
+            throw new RuntimeException("Verification code has expired. Please register again.");
         }
 
         user.setVerified(true);
         user.setVerificationToken(null);
         user.setTokenExpiry(null);
         repo.save(user);
-        LOGGER.info("Email verified successfully for user: {}", user.getEmail());
+        LOGGER.info("Email verified successfully using OTP for user: {}", user.getEmail());
+    }
+
+    @Override
+    public void resendOtp(String email) {
+        LOGGER.info("Resending OTP code for email: {}", email);
+        User user = repo.findByEmail(email)
+                .orElseThrow(() -> {
+                    LOGGER.warn("User not found with email during OTP resend request: {}", email);
+                    return new RuntimeException("User not found.");
+                });
+
+        if (user.isVerified()) {
+            LOGGER.warn("User email already verified, cannot resend OTP: {}", email);
+            throw new RuntimeException("Email already verified.");
+        }
+
+        // Generate new 6-digit OTP code
+        String otp = String.valueOf(100000 + new java.util.Random().nextInt(900000));
+        user.setVerificationToken(otp);
+        user.setTokenExpiry(LocalDateTime.now().plusMinutes(10));
+        repo.save(user);
+
+        LOGGER.info("New verification OTP generated for resend: {}", email);
+        emailService.sendVerificationEmail(user.getEmail(), otp);
     }
 }
 

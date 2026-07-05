@@ -118,6 +118,7 @@ class AuthServiceImplTest {
 
         User existing = new User();
         existing.setEmail("existing@example.com");
+        existing.setVerified(true);
 
         when(repo.findByEmail(request.getEmail())).thenReturn(Optional.of(existing));
 
@@ -180,17 +181,18 @@ class AuthServiceImplTest {
     }
 
     @Test
-    void testVerifyEmail_Success() {
-        String token = "valid_token";
+    void testVerifyOtp_Success() {
+        String email = "user@example.com";
+        String code = "123456";
         User user = new User();
-        user.setEmail("user@example.com");
-        user.setVerificationToken(token);
-        user.setTokenExpiry(LocalDateTime.now().plusHours(1));
+        user.setEmail(email);
+        user.setVerificationToken(code);
+        user.setTokenExpiry(LocalDateTime.now().plusMinutes(10));
         user.setVerified(false);
 
-        when(repo.findByVerificationToken(token)).thenReturn(Optional.of(user));
+        when(repo.findByEmail(email)).thenReturn(Optional.of(user));
 
-        service.verifyEmail(token);
+        service.verifyOtp(email, code);
 
         assertTrue(user.isVerified());
         assertNull(user.getVerificationToken());
@@ -199,28 +201,36 @@ class AuthServiceImplTest {
     }
 
     @Test
-    void testVerifyEmail_Expired() {
-        String token = "expired_token";
+    void testVerifyOtp_Expired() {
+        String email = "user@example.com";
+        String code = "123456";
         User user = new User();
-        user.setEmail("user@example.com");
-        user.setVerificationToken(token);
-        user.setTokenExpiry(LocalDateTime.now().minusHours(1));
+        user.setEmail(email);
+        user.setVerificationToken(code);
+        user.setTokenExpiry(LocalDateTime.now().minusMinutes(5));
         user.setVerified(false);
 
-        when(repo.findByVerificationToken(token)).thenReturn(Optional.of(user));
+        when(repo.findByEmail(email)).thenReturn(Optional.of(user));
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> service.verifyEmail(token));
-        assertTrue(exception.getMessage().contains("Verification token has expired"));
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> service.verifyOtp(email, code));
+        assertTrue(exception.getMessage().contains("Verification code has expired"));
         verify(repo, never()).save(any(User.class));
     }
 
     @Test
-    void testVerifyEmail_InvalidToken() {
-        String token = "invalid_token";
-        when(repo.findByVerificationToken(token)).thenReturn(Optional.empty());
+    void testVerifyOtp_InvalidCode() {
+        String email = "user@example.com";
+        String code = "123456";
+        User user = new User();
+        user.setEmail(email);
+        user.setVerificationToken("654321");
+        user.setTokenExpiry(LocalDateTime.now().plusMinutes(10));
+        user.setVerified(false);
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> service.verifyEmail(token));
-        assertTrue(exception.getMessage().contains("Invalid verification token"));
+        when(repo.findByEmail(email)).thenReturn(Optional.of(user));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> service.verifyOtp(email, code));
+        assertTrue(exception.getMessage().contains("Invalid verification code"));
         verify(repo, never()).save(any(User.class));
     }
 }

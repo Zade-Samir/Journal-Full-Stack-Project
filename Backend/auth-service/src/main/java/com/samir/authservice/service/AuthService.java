@@ -10,5 +10,7 @@ public interface AuthService {
 
     String handleGoogleLogin(String email);
 
-    void verifyEmail(String token);
+    void verifyOtp(String email, String code);
+
+    void resendOtp(String email);
 }

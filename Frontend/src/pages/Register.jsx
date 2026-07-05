@@ -44,10 +44,10 @@ export const Register = () => {
         throw new Error(data.message || data.error || "Registration failed. Server error.");
       }
 
-      // Success -> send to login page
-      navigate('/login', { 
+      // Success -> send to OTP verification page
+      navigate('/verify-otp', { 
         state: { 
-          successMessage: "Registration successful! A verification link has been sent to your email. Please check your inbox." 
+          email: email
         } 
       });
     } catch (err) {

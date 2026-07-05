@@ -41,17 +41,14 @@ public class EmailService {
     public void sendVerificationEmail(String toEmail, String token) {
         LOGGER.info("Preparing to send verification email via Resend to: {}", toEmail);
         try {
-            String verificationLink = frontendUrl + "/verify?token=" + token;
-
             String htmlMsg = "<div style=\"font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;\">"
                     + "<h2 style=\"color: #333333; text-align: center;\">Verify Your Email Address</h2>"
                     + "<p>Hello,</p>"
-                    + "<p>Thank you for registering. Please verify your email address by clicking the button below:</p>"
-                    + "<div style=\"text-align: center; margin: 30px 0;\">"
-                    + "<a href=\"" + verificationLink + "\" style=\"background-color: #000000; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 20px; font-weight: bold; display: inline-block;\">Verify Email</a>"
+                    + "<p>Thank you for registering. Please use the following One-Time Password (OTP) to verify your email address. This code is valid for 10 minutes:</p>"
+                    + "<div style=\"text-align: center; margin: 35px 0;\">"
+                    + "<span style=\"background-color: #f4f4f4; border: 1px solid #dddddd; color: #333333; font-size: 32px; font-weight: bold; letter-spacing: 6px; padding: 14px 28px; border-radius: 10px; display: inline-block;\">" + token + "</span>"
                     + "</div>"
-                    + "<p>If the button doesn't work, you can copy and paste the following link into your browser:</p>"
-                    + "<p style=\"word-break: break-all; color: #888888;\">" + verificationLink + "</p>"
+                    + "<p>If you did not request this code, you can safely ignore this email.</p>"
                     + "<p style=\"margin-top: 40px;\">Best regards,<br/>The Quiet Room Team</p>"
                     + "</div>";
 

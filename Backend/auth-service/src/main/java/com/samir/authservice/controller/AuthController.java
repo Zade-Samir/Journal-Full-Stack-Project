@@ -3,6 +3,7 @@ package com.samir.authservice.controller;
 import com.samir.authservice.common.ApiResponse;
 import com.samir.authservice.dto.AuthRequest;
 import com.samir.authservice.dto.AuthResponse;
+import com.samir.authservice.dto.VerifyOtpRequest;
 import com.samir.authservice.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -47,16 +48,30 @@ public class AuthController {
         );
     }
 
-    @GetMapping("/verify")
-    public ResponseEntity<ApiResponse<String>> verify(
-            @RequestParam("token") String token
+    @PostMapping("/verify-otp")
+    public ResponseEntity<ApiResponse<String>> verifyOtp(
+            @Valid @RequestBody VerifyOtpRequest request
     ) {
-        LOGGER.info("API HIT: Verify email endpoint called");
-        service.verifyEmail(token);
+        LOGGER.info("API HIT: Verify OTP endpoint called for email: {}", request.getEmail());
+        service.verifyOtp(request.getEmail(), request.getCode());
         return ResponseEntity.ok(
                 new ApiResponse<>(
                         true,
                         "Email verified successfully!",
+                        null)
+        );
+    }
+
+    @PostMapping("/resend-otp")
+    public ResponseEntity<ApiResponse<String>> resendOtp(
+            @RequestParam("email") String email
+    ) {
+        LOGGER.info("API HIT: Resend OTP endpoint called for email: {}", email);
+        service.resendOtp(email);
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "New verification code sent successfully!",
                         null)
         );
     }
