@@ -9,4 +9,6 @@ public interface AuthService {
     void register(AuthRequest request);
 
     String handleGoogleLogin(String email);
+
+    void verifyEmail(String token);
 }

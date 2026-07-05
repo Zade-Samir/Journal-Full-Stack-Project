@@ -10,6 +10,7 @@ import { Completion } from './pages/Completion';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Landing } from './pages/Landing';
+import { VerifyEmail } from './pages/VerifyEmail';
 import { AppSettingsProvider } from './context/AppSettingsContext';
 import { GlobalThemeToggle } from './components/GlobalThemeToggle';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -34,6 +35,7 @@ export default function App() {
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/verify" element={<VerifyEmail />} />
           <Route path="/oauth-success" element={<OAuthSuccess />} />
         </Routes>
       </BrowserRouter>

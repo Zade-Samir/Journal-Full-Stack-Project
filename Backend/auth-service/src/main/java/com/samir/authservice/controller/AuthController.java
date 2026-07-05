@@ -46,4 +46,18 @@ public class AuthController {
                         result)
         );
     }
+
+    @GetMapping("/verify")
+    public ResponseEntity<ApiResponse<String>> verify(
+            @RequestParam("token") String token
+    ) {
+        LOGGER.info("API HIT: Verify email endpoint called");
+        service.verifyEmail(token);
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Email verified successfully!",
+                        null)
+        );
+    }
 }

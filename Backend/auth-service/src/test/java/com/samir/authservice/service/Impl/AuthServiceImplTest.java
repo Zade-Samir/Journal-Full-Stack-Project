@@ -4,7 +4,9 @@ import com.samir.authservice.dto.AuthRequest;
 import com.samir.authservice.dto.AuthResponse;
 import com.samir.authservice.entity.User;
 import com.samir.authservice.repo.UserRepo;
+import com.samir.authservice.service.EmailService;
 import com.samir.authservice.util.JwtUtil;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -29,6 +31,9 @@ class AuthServiceImplTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private EmailService emailService;
+
     @InjectMocks
     private AuthServiceImpl service;
 
@@ -47,6 +52,7 @@ class AuthServiceImplTest {
         user.setEmail("user@example.com");
         user.setPassword("encoded_password");
         user.setRole("USER");
+        user.setVerified(true);
 
         when(repo.findByEmail(request.getEmail())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(request.getPassword(), user.getPassword())).thenReturn(true);
@@ -81,6 +87,7 @@ class AuthServiceImplTest {
         user.setEmail("user@example.com");
         user.setPassword("encoded_password");
         user.setRole("USER");
+        user.setVerified(true);
 
         when(repo.findByEmail(request.getEmail())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(request.getPassword(), user.getPassword())).thenReturn(false);
@@ -125,6 +132,7 @@ class AuthServiceImplTest {
         User user = new User();
         user.setEmail(email);
         user.setRole("USER");
+        user.setVerified(true);
 
         when(repo.findByEmail(email)).thenReturn(Optional.of(user));
         when(jwtUtil.generateToken(email, "USER")).thenReturn("google_jwt_token");
@@ -150,5 +158,69 @@ class AuthServiceImplTest {
 
         assertEquals("new_google_jwt_token", token);
         verify(repo).save(any(User.class));
+    }
+
+    @Test
+    void testLogin_Unverified() {
+        AuthRequest request = new AuthRequest();
+        request.setEmail("user@example.com");
+        request.setPassword("password");
+
+        User user = new User();
+        user.setEmail("user@example.com");
+        user.setPassword("encoded_password");
+        user.setRole("USER");
+        user.setVerified(false);
+
+        when(repo.findByEmail(request.getEmail())).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(request.getPassword(), user.getPassword())).thenReturn(true);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> service.login(request));
+        assertTrue(exception.getMessage().contains("Please verify your email address"));
+    }
+
+    @Test
+    void testVerifyEmail_Success() {
+        String token = "valid_token";
+        User user = new User();
+        user.setEmail("user@example.com");
+        user.setVerificationToken(token);
+        user.setTokenExpiry(LocalDateTime.now().plusHours(1));
+        user.setVerified(false);
+
+        when(repo.findByVerificationToken(token)).thenReturn(Optional.of(user));
+
+        service.verifyEmail(token);
+
+        assertTrue(user.isVerified());
+        assertNull(user.getVerificationToken());
+        assertNull(user.getTokenExpiry());
+        verify(repo).save(user);
+    }
+
+    @Test
+    void testVerifyEmail_Expired() {
+        String token = "expired_token";
+        User user = new User();
+        user.setEmail("user@example.com");
+        user.setVerificationToken(token);
+        user.setTokenExpiry(LocalDateTime.now().minusHours(1));
+        user.setVerified(false);
+
+        when(repo.findByVerificationToken(token)).thenReturn(Optional.of(user));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> service.verifyEmail(token));
+        assertTrue(exception.getMessage().contains("Verification token has expired"));
+        verify(repo, never()).save(any(User.class));
+    }
+
+    @Test
+    void testVerifyEmail_InvalidToken() {
+        String token = "invalid_token";
+        when(repo.findByVerificationToken(token)).thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> service.verifyEmail(token));
+        assertTrue(exception.getMessage().contains("Invalid verification token"));
+        verify(repo, never()).save(any(User.class));
     }
 }

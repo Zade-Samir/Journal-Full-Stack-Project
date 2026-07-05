@@ -36,10 +36,12 @@ public class Goal {
     private LocalDate targetDate;
 
     @Enumerated(EnumType.STRING)
+    @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.VARCHAR)
     @Column(name = "status", nullable = false)
     private GoalStatus status = GoalStatus.NOT_STARTED;
 
     @Enumerated(EnumType.STRING)
+    @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.VARCHAR)
     @Column(name = "type", nullable = false)
     private GoalType type = GoalType.SHORT_TERM;
 

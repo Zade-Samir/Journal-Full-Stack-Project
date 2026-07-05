@@ -45,7 +45,11 @@ export const Register = () => {
       }
 
       // Success -> send to login page
-      navigate('/login', { state: { successMessage: "Registration successful! Please log in." } });
+      navigate('/login', { 
+        state: { 
+          successMessage: "Registration successful! A verification link has been sent to your email. Please check your inbox." 
+        } 
+      });
     } catch (err) {
       // Common issue: CORS or connection refused when backend is down
       if (err.message.includes('fetch')) {

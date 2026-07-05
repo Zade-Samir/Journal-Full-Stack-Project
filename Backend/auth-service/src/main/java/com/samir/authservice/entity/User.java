@@ -16,4 +16,14 @@ public class User {
     private String email;
     private String password;
     private String role;
+
+    @Column(name = "is_verified", nullable = false)
+    private boolean isVerified = false;
+
+    @Column(name = "verification_token")
+    private String verificationToken;
+
+    @Column(name = "token_expiry")
+    private java.time.LocalDateTime tokenExpiry;
 }
+

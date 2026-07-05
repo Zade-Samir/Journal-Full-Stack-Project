@@ -120,7 +120,8 @@ class JournalServiceImplTest {
         when(repo.findByUserIdAndDateAndIsDeletedFalse(eq(email), any(LocalDate.class)))
                 .thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> service.getTodayJournal(email));
+        JournalRequestDTO result = service.getTodayJournal(email);
+        assertNull(result);
     }
 
     @Test

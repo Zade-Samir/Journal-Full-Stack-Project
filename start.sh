@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Load environment variables from .env file if present
+if [ -f .env ]; then
+    export $(cat .env | grep -v '^#' | xargs)
+fi
+
 echo "======================================================================="
 echo "  Starting Journal App Services (macOS)"
 echo "======================================================================="
@@ -31,7 +36,7 @@ sleep 12
 
 echo ""
 echo "2. Starting Auth Service on Port 8082..."
-osascript -e "tell app \"Terminal\" to do script \"cd '$WORKSPACE_DIR/Backend/auth-service' && export DB_PASSWORD='$DB_PASSWORD' && export JWT_SECRET='$JWT_SECRET' && ./mvnw spring-boot:run\""
+osascript -e "tell app \"Terminal\" to do script \"cd '$WORKSPACE_DIR/Backend/auth-service' && export DB_PASSWORD='$DB_PASSWORD' && export JWT_SECRET='$JWT_SECRET' && export GOOGLE_CLIENT_ID='$GOOGLE_CLIENT_ID' && export GOOGLE_CLIENT_SECRET='$GOOGLE_CLIENT_SECRET' && export RESEND_API_KEY='$RESEND_API_KEY' && export RESEND_FROM_EMAIL='$RESEND_FROM_EMAIL' && ./mvnw spring-boot:run\""
 
 echo ""
 echo "3. Starting Journal Service on Port 8081..."

@@ -23,6 +23,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -98,17 +99,13 @@ public class JournalServiceImpl implements JournalService {
 
         LocalDate today = LocalDate.now();
 
-        Journal journal = repo.findByUserIdAndDateAndIsDeletedFalse(userEmail, today)
-                .orElseThrow(
-                        () -> {
-                            LOGGER.warn("No journal found for user: {} on date: {}", userEmail, today);
-                            return new ResourceNotFoundException("No journal found today!");
-                        }
-                );
+        Optional<Journal> journalOpt = repo.findByUserIdAndDateAndIsDeletedFalse(userEmail, today);
+        if (journalOpt.isEmpty()) {
+            LOGGER.info("No journal found for user: {} on date: {}", userEmail, today);
+            return null;
+        }
 
-
-
-        return mapper.toDTO(journal); //converting entity into dto
+        return mapper.toDTO(journalOpt.get()); //converting entity into dto
     }
 
     //update the journal

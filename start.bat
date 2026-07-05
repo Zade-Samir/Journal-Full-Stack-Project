@@ -1,6 +1,13 @@
 @echo off
 setlocal enabledelayedexpansion
 
+:: Load environment variables from .env file if it exists
+if exist .env (
+    for /f "usebackq tokens=1,2 delims==" %%i in (".env") do (
+        set "%%i=%%j"
+    )
+)
+
 echo =======================================================================
 echo   Starting Journal App Services (Windows)
 echo =======================================================================
@@ -29,7 +36,7 @@ timeout /t 12 /nobreak
 echo.
 echo 2. Starting Auth Service on Port 8082...
 cd Backend\auth-service
-start "Auth Service [Port 8082]" cmd /k "set DB_PASSWORD=%DB_PASSWORD%&& set JWT_SECRET=%JWT_SECRET%&& mvnw spring-boot:run"
+start "Auth Service [Port 8082]" cmd /k "set DB_PASSWORD=%DB_PASSWORD%&& set JWT_SECRET=%JWT_SECRET%&& set GOOGLE_CLIENT_ID=%GOOGLE_CLIENT_ID%&& set GOOGLE_CLIENT_SECRET=%GOOGLE_CLIENT_SECRET%&& set RESEND_API_KEY=%RESEND_API_KEY%&& set RESEND_FROM_EMAIL=%RESEND_FROM_EMAIL%&& mvnw spring-boot:run"
 cd ..\..
 
 echo.
