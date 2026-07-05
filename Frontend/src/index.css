@@ -69,3 +69,31 @@ textarea:focus, input:focus, select:focus {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* ─── Page Entrance Animations ─────────────────────────────────────────────── */
+
+@keyframes slide-up-fade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-slow {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Slide up + fade — used by Archive, Goals, Analytics, Reflection */
+.page-enter {
+  animation: slide-up-fade 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Gentle fade-in — used by Today (Home) main content */
+.content-fade {
+  animation: fade-in-slow 0.7s ease both;
+}

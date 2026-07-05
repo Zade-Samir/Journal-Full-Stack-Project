@@ -216,7 +216,7 @@ export function Goals() {
 
   return (
     <div className={cn(
-      "mx-auto px-6 py-12 md:py-20 flex gap-8 relative animate-in slide-in-from-bottom-4 fade-in duration-500", 
+      "mx-auto px-6 py-12 md:py-20 flex gap-8 relative page-enter", 
       isFullWidth ? "max-w-[120rem] md:px-16" : "max-w-6xl"
     )}>
       {/* Main Panel */}

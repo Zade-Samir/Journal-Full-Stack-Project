@@ -68,7 +68,7 @@ export function Reflection() {
 
   return (
     <div className={cn(
-      "mx-auto px-6 py-12 md:py-20", 
+      "mx-auto px-6 py-12 md:py-20 page-enter", 
       isFullWidth ? "max-w-[120rem] md:px-16" : "max-w-6xl"
     )}>
       {/* Header */}
@@ -117,7 +117,7 @@ export function Reflection() {
       </header>
 
       {showCustomRange && (
-        <div className="bg-input-bg/40 p-4 rounded-2xl border border-border/30 mb-8 max-w-xl flex flex-wrap items-end gap-4 animate-in slide-in-from-top duration-200">
+        <div className="bg-input-bg/40 p-4 rounded-2xl border border-border/30 mb-8 max-w-xl flex flex-wrap items-end gap-4 page-enter">
           <div>
             <label className="text-[10px] font-bold text-text-secondary uppercase tracking-wider mb-1.5 block">Start Date</label>
             <input 
@@ -159,7 +159,7 @@ export function Reflection() {
           <p className="text-sm font-medium">Aggregating summaries...</p>
         </div>
       ) : summary && (
-        <div className="space-y-8 animate-in fade-in duration-300">
+        <div className="space-y-8 content-fade">
           {/* Top Aggregates row */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
