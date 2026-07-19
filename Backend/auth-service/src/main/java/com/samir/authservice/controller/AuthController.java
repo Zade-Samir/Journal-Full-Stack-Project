@@ -6,9 +6,10 @@ import com.samir.authservice.dto.AuthResponse;
 import com.samir.authservice.dto.VerifyOtpRequest;
 import com.samir.authservice.service.AuthService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.HttpHeaders;
@@ -17,11 +18,14 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/auth")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService service;
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthController.class);
+
+    @Value("${app.cookie.secure:false}")
+    private boolean cookieSecure;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<String>> register(
@@ -48,7 +52,7 @@ public class AuthController {
         // Write secure HttpOnly cookie for refresh token
         ResponseCookie cookie = ResponseCookie.from("refresh_token", result.getRefreshToken())
                 .httpOnly(true)
-                .secure(false) // Set to false to support local testing over HTTP without SSL
+                .secure(cookieSecure)
                 .path("/")
                 .maxAge(7 * 24 * 60 * 60) // 7 days
                 .sameSite("Lax")
@@ -125,7 +129,7 @@ public class AuthController {
         // Clear refresh_token cookie
         ResponseCookie cookie = ResponseCookie.from("refresh_token", "")
                 .httpOnly(true)
-                .secure(false)
+                .secure(cookieSecure)
                 .path("/")
                 .maxAge(0) // immediately delete
                 .sameSite("Lax")
@@ -154,7 +158,7 @@ public class AuthController {
         // Clear refresh_token cookie too
         ResponseCookie cookie = ResponseCookie.from("refresh_token", "")
                 .httpOnly(true)
-                .secure(false)
+                .secure(cookieSecure)
                 .path("/")
                 .maxAge(0)
                 .sameSite("Lax")

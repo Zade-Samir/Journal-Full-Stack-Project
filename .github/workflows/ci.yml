@@ -1,0 +1,87 @@
+name: Full Stack Journal App CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-ci:
+    name: Backend CI (Java 17)
+    runs-on: ubuntu-latest
+    env:
+      DB_PASSWORD: dummy_db_password
+      JWT_SECRET: dummyLocalDevSecretKey_replaceInProd_32chars
+      GOOGLE_CLIENT_ID: dummy_client_id
+      GOOGLE_CLIENT_SECRET: dummy_client_secret
+      RESEND_API_KEY: dummy_resend_api_key
+      RESEND_FROM_EMAIL: onboarding@resend.dev
+      EUREKA_URL: http://localhost:8761/eureka
+      ZIPKIN_URL: http://localhost:9411/api/v2/spans
+      COOKIE_SECURE: false
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+
+      - name: Build Eureka Server
+        run: |
+          cd Backend/eureka-server
+          chmod +x mvnw
+          ./mvnw clean package -DskipTests
+
+      - name: Build API Gateway
+        run: |
+          cd Backend/api-gateway
+          chmod +x mvnw
+          ./mvnw clean package -DskipTests
+
+      - name: Build Auth Service
+        run: |
+          cd Backend/auth-service
+          chmod +x mvnw
+          ./mvnw clean package -DskipTests
+
+      - name: Build & Test Journal Service
+        run: |
+          cd Backend/journal-service
+          chmod +x mvnw
+          ./mvnw clean package -DskipTests
+
+  frontend-ci:
+    name: Frontend CI (Node 20)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'Frontend/package-lock.json'
+
+      - name: Install Dependencies
+        run: |
+          cd Frontend
+          npm install
+
+      - name: Run Tests
+        run: |
+          cd Frontend
+          npm run test
+
+      - name: Build Frontend
+        run: |
+          cd Frontend
+          npm run build

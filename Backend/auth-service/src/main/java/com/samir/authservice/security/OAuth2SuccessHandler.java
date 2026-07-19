@@ -27,6 +27,9 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     @Value("${app.frontend.url}")
     private String frontendUrl;
 
+    @Value("${app.cookie.secure:false}")
+    private boolean cookieSecure;
+
     @Override
     public void onAuthenticationSuccess(
             HttpServletRequest request,
@@ -50,7 +53,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             // Write secure HttpOnly cookie for refresh token
             org.springframework.http.ResponseCookie cookie = org.springframework.http.ResponseCookie.from("refresh_token", result.getRefreshToken())
                     .httpOnly(true)
-                    .secure(false) // Set to false to support local testing over HTTP without SSL
+                    .secure(cookieSecure)
                     .path("/")
                     .maxAge(7 * 24 * 60 * 60) // 7 days
                     .sameSite("Lax")
